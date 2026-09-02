@@ -14,16 +14,7 @@ from mvt.common.cli_plugins import (
     load_cli_commands_option,
     register_cli_plugins,
 )
-from mvt.common.cmd_check_iocs import CmdCheckIOCS
-from mvt.common.completion import (
-    SUPPORTED_SHELLS,
-    completion_instructions,
-    generate_completion_script,
-    install_completion_script,
-)
-from mvt.common.logo import logo
 from mvt.common.options import MutuallyExclusiveOption
-from mvt.common.updates import IndicatorsUpdates
 from mvt.common.utils import (
     generate_hashes_from_path,
     init_logging,
@@ -45,6 +36,7 @@ from mvt.common.help import (
     HELP_MSG_LOAD_MODULE,
     HELP_MSG_MODULE,
     HELP_MSG_VERBOSE,
+    HELP_MSG_VERBOSE_COMMAND,
     HELP_MSG_CHECK_FS,
     HELP_MSG_CHECK_IOCS,
     HELP_MSG_STIX2,
@@ -52,21 +44,17 @@ from mvt.common.help import (
     HELP_MSG_CHECK_SYSDIAGNOSE,
     HELP_MSG_DISABLE_UPDATE_CHECK,
     HELP_MSG_DISABLE_INDICATOR_UPDATE_CHECK,
-    HELP_MSG_COMPLETION,
 )
-from mvt.common.module_loader import CustomModuleLoadError, load_custom_modules
 from mvt.common.password import prompt_password
-from .cmd_check_backup import CmdIOSCheckBackup
-from .cmd_check_fs import CmdIOSCheckFS
-from .cmd_check_sysdiagnose import CmdIOSCheckSysdiagnose
-from .decrypt import (
+from .decrypt_config import (
     DEFAULT_DECRYPT_WORKERS,
     MAX_DECRYPT_WORKERS,
-    DecryptBackup,
 )
-from .modules.backup import BACKUP_MODULES
-from .modules.fs import FS_MODULES
-from .modules.mixed import MIXED_MODULES
+
+# The commands import what they run only when they are invoked. This module is
+# imported at every start of mvt-ios, including by shell completion on every
+# keystroke, so importing it must do no more than build the command tree: the
+# forensic modules, the backup decryption and the update checks stay out of it.
 
 init_logging()
 log = logging.getLogger("mvt")
@@ -86,7 +74,14 @@ def _get_disable_flags(ctx):
     )
 
 
+def _get_verbose(ctx):
+    """Return whether --verbose was passed to the CLI itself."""
+    return bool(ctx.obj and ctx.obj.get("verbose", False))
+
+
 def _load_custom_modules(load_module):
+    from mvt.common.module_loader import CustomModuleLoadError, load_custom_modules
+
     try:
         return load_custom_modules(load_module)
     except CustomModuleLoadError as exc:
@@ -106,58 +101,29 @@ def _load_custom_modules(load_module):
     is_flag=True,
     help=HELP_MSG_DISABLE_INDICATOR_UPDATE_CHECK,
 )
+@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE)
 @click.pass_context
-def cli(ctx, disable_update_check, disable_indicator_update_check):
+def cli(ctx, disable_update_check, disable_indicator_update_check, verbose):
     ctx.ensure_object(dict)
     ctx.obj["disable_version_check"] = disable_update_check
     ctx.obj["disable_indicator_check"] = disable_indicator_update_check
-    if ctx.invoked_subcommand != "completion":
-        logo(
-            disable_version_check=disable_update_check,
-            disable_indicator_check=disable_indicator_update_check,
-        )
+    ctx.obj["verbose"] = verbose
+    set_verbose_logging(verbose)
+
+    from mvt.common.logo import logo
+
+    logo(
+        disable_version_check=disable_update_check,
+        disable_indicator_check=disable_indicator_update_check,
+    )
 
 
 # ==============================================================================
 # Command: version
 # ==============================================================================
-@cli.command("version", help=HELP_MSG_VERSION)
+@cli.command("version", context_settings=CONTEXT_SETTINGS, help=HELP_MSG_VERSION)
 def version():
     return
-
-
-# ==============================================================================
-# Command: completion
-# ==============================================================================
-@cli.command("completion", context_settings=CONTEXT_SETTINGS, help=HELP_MSG_COMPLETION)
-@click.argument("shell", required=False, type=click.Choice(SUPPORTED_SHELLS))
-@click.option(
-    "--install",
-    is_flag=True,
-    help="Write completion files and update shell configuration.",
-)
-@click.pass_context
-def completion(ctx, shell, install):
-    program_name = "mvt-ios"
-
-    if shell is None:
-        if install:
-            raise click.UsageError("A shell is required when using --install.")
-        click.echo(completion_instructions(program_name))
-        return
-
-    root_cli = ctx.find_root().command
-
-    if install:
-        script_path = install_completion_script(root_cli, program_name, shell)
-        click.echo(f"Installed {shell} completion to {script_path}")
-        if shell in ("bash", "zsh"):
-            click.echo(f"Updated ~/.{shell}rc")
-        else:
-            click.echo("Fish loads completion files automatically.")
-        return
-
-    click.echo(generate_completion_script(root_cli, program_name, shell))
 
 
 # ==============================================================================
@@ -193,6 +159,8 @@ def completion(ctx, shell, install):
 @click.argument("BACKUP_PATH", type=click.Path(exists=True))
 @click.pass_context
 def decrypt_backup(ctx, destination, jobs, password, key_file, hashes, backup_path):
+    from .decrypt import DecryptBackup
+
     backup = DecryptBackup(backup_path, destination, max_workers=jobs)
 
     if key_file:
@@ -256,6 +224,8 @@ def decrypt_backup(ctx, destination, jobs, password, key_file, hashes, backup_pa
 )
 @click.argument("BACKUP_PATH", type=click.Path(exists=True))
 def extract_key(password, key_file, backup_path):
+    from .decrypt import DecryptBackup
+
     backup = DecryptBackup(backup_path)
 
     if password:
@@ -308,7 +278,7 @@ def extract_key(password, key_file, backup_path):
     help=HELP_MSG_LOAD_MODULE,
 )
 @click.option("--hashes", "-H", is_flag=True, help=HELP_MSG_HASHES)
-@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE)
+@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE_COMMAND)
 @click.argument("BACKUP_PATH", type=click.Path(exists=True))
 @click.pass_context
 def check_backup(
@@ -323,7 +293,9 @@ def check_backup(
     verbose,
     backup_path,
 ):
-    set_verbose_logging(verbose)
+    from .cmd_check_backup import CmdIOSCheckBackup
+
+    set_verbose_logging(verbose or _get_verbose(ctx))
     module_options = {"fast_mode": fast}
     custom_modules = _load_custom_modules(load_module)
 
@@ -377,7 +349,7 @@ def check_backup(
     help=HELP_MSG_LOAD_MODULE,
 )
 @click.option("--hashes", "-H", is_flag=True, help=HELP_MSG_HASHES)
-@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE)
+@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE_COMMAND)
 @click.argument("DUMP_PATH", type=click.Path(exists=True))
 @click.pass_context
 def check_fs(
@@ -392,7 +364,9 @@ def check_fs(
     verbose,
     dump_path,
 ):
-    set_verbose_logging(verbose)
+    from .cmd_check_fs import CmdIOSCheckFS
+
+    set_verbose_logging(verbose or _get_verbose(ctx))
     module_options = {"fast_mode": fast}
     custom_modules = _load_custom_modules(load_module)
 
@@ -446,7 +420,7 @@ def check_fs(
     help=HELP_MSG_LOAD_MODULE,
 )
 @click.option("--hashes", "-H", is_flag=True, help=HELP_MSG_HASHES)
-@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE)
+@click.option("--verbose", "-v", is_flag=True, help=HELP_MSG_VERBOSE_COMMAND)
 @click.argument("SYSDIAGNOSE_PATH", type=click.Path(exists=True))
 @click.pass_context
 def check_sysdiagnose(
@@ -460,7 +434,9 @@ def check_sysdiagnose(
     verbose,
     sysdiagnose_path,
 ):
-    set_verbose_logging(verbose)
+    from .cmd_check_sysdiagnose import CmdIOSCheckSysdiagnose
+
+    set_verbose_logging(verbose or _get_verbose(ctx))
     custom_modules = _load_custom_modules(load_module)
     cmd = CmdIOSCheckSysdiagnose(
         target_path=sysdiagnose_path,
@@ -514,6 +490,10 @@ def check_sysdiagnose(
 @click.argument("FOLDER", type=click.Path(exists=True))
 @click.pass_context
 def check_iocs(ctx, iocs, list_modules, module, load_module, folder):
+    from mvt.common.cmd_check_iocs import CmdCheckIOCS
+
+    from .command_modules import IOS_CHECK_IOCS_MODULES
+
     custom_modules = _load_custom_modules(load_module)
     cmd = CmdCheckIOCS(
         target_path=folder,
@@ -524,7 +504,7 @@ def check_iocs(ctx, iocs, list_modules, module, load_module, folder):
         custom_modules=custom_modules,
         platform="ios",
     )
-    cmd.modules = BACKUP_MODULES + FS_MODULES + MIXED_MODULES
+    cmd.modules = IOS_CHECK_IOCS_MODULES
 
     if list_modules:
         cmd.list_modules()
@@ -540,12 +520,25 @@ def check_iocs(ctx, iocs, list_modules, module, load_module, folder):
 # ==============================================================================
 @cli.command("download-iocs", context_settings=CONTEXT_SETTINGS, help=HELP_MSG_STIX2)
 def download_iocs():
+    from mvt.common.updates import IndicatorsUpdates
+
     ioc_updates = IndicatorsUpdates()
     ioc_updates.update()
 
 
-register_cli_plugins(
-    cli,
-    entry_point_group=IOS_CLI_PLUGIN_GROUP,
-    environment_variable=MVT_IOS_CUSTOM_COMMANDS_ENV,
-)
+# ==============================================================================
+# Entry point of the mvt-ios console script
+# ==============================================================================
+def main() -> None:
+    """Register the external commands and run the mvt-ios CLI.
+
+    External commands are registered here rather than when this module is
+    imported, so that importing MVT never runs third-party code and a plugin
+    importing from MVT cannot re-enter a module that is still initializing.
+    """
+    register_cli_plugins(
+        cli,
+        entry_point_group=IOS_CLI_PLUGIN_GROUP,
+        environment_variable=MVT_IOS_CUSTOM_COMMANDS_ENV,
+    )
+    cli()

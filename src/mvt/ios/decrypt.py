@@ -26,10 +26,9 @@ from iphone_backup_decrypt import EncryptedBackup
 from iphone_backup_decrypt import google_iphone_dataprotection
 from iphone_backup_decrypt.utils import FilePlist
 
-log = logging.getLogger(__name__)
+from .decrypt_config import DEFAULT_DECRYPT_WORKERS, MAX_DECRYPT_WORKERS
 
-DEFAULT_DECRYPT_WORKERS = 4
-MAX_DECRYPT_WORKERS = 32
+log = logging.getLogger(__name__)
 
 # Import pbkdf2_hmac from the same source iphone_backup_decrypt uses internally,
 # so our key derivation is consistent with theirs.
