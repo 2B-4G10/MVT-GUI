@@ -96,7 +96,7 @@ class TestBugreportAnalysis:
 
     def test_settings_module(self):
         m = self.launch_bug_report_module(Settings)
-        assert len(m.results) == 11
+        assert len(m.results) == 12
 
         assert len(m.alertstore.alerts) == 1
         assert "accessibility_enabled = 1" in m.alertstore.alerts[0].message

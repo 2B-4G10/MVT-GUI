@@ -25,7 +25,7 @@ class TestSettingsArtifact:
     def test_parsing(self):
         settings = parse_bugreport_settings()
 
-        assert len(settings.results) == 11
+        assert len(settings.results) == 12
         assert {result["namespace"] for result in settings.results} == {
             "config",
             "global",
@@ -68,6 +68,24 @@ class TestSettingsArtifact:
         record = find(settings, "namespace_one/streaming_blocked_components")[0]
         assert record["value"] == "com.example.dialer,com.example.camera"
         assert record["default"] == "com.android.settings,\n        com.android.vending"
+
+    def test_trailing_metadata_is_not_part_of_the_value(self):
+        settings = parse_bugreport_settings()
+
+        record = find(settings, "lock_screen_show_notifications")[0]
+        assert record["value"] == "1"
+        assert record["defaultSystemSet"] == "true"
+        assert record["isValuePreservedInRestore"] == "true"
+
+        # Without a default, the tag or the restore token follows the value.
+        record = find(settings, "accessibility_enabled")[1]
+        assert record["value"] == "0"
+        assert record["tag"] == "null"
+        assert "default" not in record
+
+        record = find(settings, "send_action_app_error")[0]
+        assert record["value"] == "1"
+        assert record["isValuePreservedInRestore"] == "false"
 
     def test_repeated_names_are_kept_as_separate_records(self):
         settings = parse_bugreport_settings()

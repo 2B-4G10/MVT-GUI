@@ -66,8 +66,20 @@ ANDROID_DANGEROUS_SETTINGS = [
 ]
 
 # dumpsys prints the fields of a setting record, and of a change history entry,
-# always in this order and separated by a single space.
-SETTING_FIELDS = ("_id", "name", "pkg", "value")
+# always in this order and separated by a single space. After the value come
+# `default:` and `defaultSystemSet:` when a default is recorded, then `tag:`;
+# some vendor builds add whether the value survives a restore, either as
+# `isValuePreservedInRestore:` or as a bare `notPreservedInRestore` token.
+SETTING_FIELDS = (
+    "_id",
+    "name",
+    "pkg",
+    "value",
+    "default",
+    "defaultSystemSet",
+    "tag",
+    "isValuePreservedInRestore",
+)
 HISTORY_FIELDS = ("time", "mode", "oldValue", "newValue", "package")
 
 NAMESPACE_PATTERN = re.compile(
@@ -81,9 +93,9 @@ class Settings(AndroidArtifact):
 
     Every row of the settings provider becomes one result, keeping the fields
     dumpsys prints alongside the value: the row id, the package which recorded
-    the setting, the default, and the change history. A setting name can appear
-    more than once within a namespace, so results are a list rather than a
-    mapping.
+    the setting, the default, the tag, and the change history. A setting name
+    can appear more than once within a namespace, so results are a list rather
+    than a mapping.
     """
 
     def serialize(self, result: ModuleAtomicResult) -> ModuleSerializedResult:
@@ -269,26 +281,14 @@ class Settings(AndroidArtifact):
         section_end: Optional[datetime],
     ) -> ModuleAtomicResult:
         text = "\n".join(record_lines).rstrip()
-
-        # `default:` and `defaultSystemSet:` are printed after the value, and
-        # the default may itself be multi-line, so peel them off the end first.
-        default = None
-        default_system_set = None
-        head, separator, tail = text.rpartition(" defaultSystemSet:")
-        if separator:
-            default_system_set = tail.strip()
-            text = head
-            head, separator, tail = text.rpartition(" default:")
-            if separator:
-                default = tail
-                text = head
+        # The bare `notPreservedInRestore` token has no `key:` shape and is
+        # printed last, so peel it off before splitting the fields.
+        head = text.removesuffix(" notPreservedInRestore")
 
         record: ModuleAtomicResult = {"namespace": namespace, "user": user}
-        record.update(self._split_fields(text, SETTING_FIELDS))
-        if default is not None:
-            record["default"] = default
-        if default_system_set is not None:
-            record["defaultSystemSet"] = default_system_set
+        record.update(self._split_fields(head, SETTING_FIELDS))
+        if head != text:
+            record["isValuePreservedInRestore"] = "false"
 
         record["history"] = [
             self._parse_history(entry, section_end) for entry in history_lines
