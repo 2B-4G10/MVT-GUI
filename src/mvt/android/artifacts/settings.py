@@ -177,6 +177,14 @@ class Settings(AndroidArtifact):
             if namespace is None:
                 continue
 
+            if not line.strip():
+                # dumpsys prints a blank line after every namespace block and
+                # after a change history, and other dumps such as the
+                # generation registry follow the last block, so a blank line
+                # closes the record being read.
+                flush()
+                continue
+
             if line.startswith("_id:"):
                 flush()
                 record_lines = [line]

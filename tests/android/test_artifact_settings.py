@@ -87,6 +87,20 @@ class TestSettingsArtifact:
         assert record["value"] == "1"
         assert record["isValuePreservedInRestore"] == "false"
 
+    def test_dumps_after_the_last_block_are_not_part_of_the_last_row(self):
+        settings = parse_bugreport_settings()
+
+        assert settings.results[-1] == {
+            "namespace": "secure",
+            "user": "10",
+            "_id": "311",
+            "name": "accessibility_enabled",
+            "pkg": "android",
+            "value": "0",
+            "tag": "null",
+            "history": [],
+        }
+
     def test_repeated_names_are_kept_as_separate_records(self):
         settings = parse_bugreport_settings()
 
