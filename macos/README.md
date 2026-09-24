@@ -41,7 +41,3 @@ Screens: `setup`, `indicators`, `results`, or a command name such as
 - **Release macOS app:** run it with a version such as `2.0.0-beta`. It
   builds the app, tags the commit `gui-v<version>` and publishes a release.
 - **Screenshots:** captures the app's screens into `screenshots/`.
-
-Optional: a `SYNC_TOKEN` secret (a fine-grained token for this repository
-with *Contents* and *Workflows* set to read and write) makes the normal
-checks also run on synced commits.
