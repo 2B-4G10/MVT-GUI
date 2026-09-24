@@ -75,18 +75,7 @@ Download them again from time to time to stay current.
   without the phone.
 - Passwords go to MVT privately and never appear on the command line.
 
-## Use it responsibly
 
-Only check phones whose owners have agreed. This is a condition of the
-[MVT license](https://docs.mvt.re/en/latest/license/) that this project
-uses (see [LICENSE](LICENSE)).
+# You Can show your Love here!❤️ https://patreon.com/Dossary
 
-## For developers
-
-- **Code:** the app is in [`macos/`](macos/README.md). MVT itself is in
-  `src/`, kept in sync with
-  [mvt-project/mvt](https://github.com/mvt-project/mvt) every day.
-- **Build:** open `macos/MVTGUI.xcodeproj` in Xcode 15 or newer and press ⌘R.
-- **Release:** run **Actions → Release macOS app** with a version such as
-  `2.0.0-beta`.
-- **MVT on the command line:** see the [MVT documentation](https://docs.mvt.re/).
+## Made in Saudi 🇸🇦
