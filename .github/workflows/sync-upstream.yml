@@ -11,11 +11,8 @@ name: Sync upstream
 # pushed there (for example to adapt the app to an upstream change) are kept
 # by later runs. It never opens pull requests.
 #
-# An optional SYNC_TOKEN repository secret (a fine-grained personal access
-# token for this repository with Contents and Workflows set to read and
-# write) makes the regular CI run on the commits the sync pushes, and covers
-# the case of GitHub ever refusing the built-in token a merge that changes
-# .github/workflows/.
+# Merges always keep this fork's README and drop the upstream files and
+# workflows this fork doesn't carry (see FORK_* below).
 #
 # Run it by hand from the Actions tab. "Dry run" merges and runs every check
 # without updating the default branch. Naming another upstream branch
@@ -87,7 +84,6 @@ jobs:
         with:
           ref: ${{ env.BASE_BRANCH }}
           fetch-depth: 0
-          token: ${{ secrets.SYNC_TOKEN || github.token }}
 
       - name: Fetch upstream
         id: fetch
@@ -192,14 +188,7 @@ jobs:
             cat "$RUNNER_TEMP/push.log"
             [ "$attempt" = 3 ] || sleep $((attempt * 10))
           done
-          # GitHub refuses workflow file changes pushed with GITHUB_TOKEN, and
-          # doesn't always say so (sometimes it answers "Internal Server Error").
-          if grep -qi 'refusing to allow .* workflow' "$RUNNER_TEMP/push.log" \
-             || [ -n "$(git diff --name-only "origin/${BASE_BRANCH}" HEAD -- .github/workflows)" ]; then
-            echo "problem=workflows" >> "$GITHUB_OUTPUT"
-          else
-            echo "problem=push" >> "$GITHUB_OUTPUT"
-          fi
+          echo "problem=push" >> "$GITHUB_OUTPUT"
 
       - name: Save the report
         if: always() && steps.merge.outcome != 'skipped'
@@ -260,7 +249,6 @@ jobs:
         with:
           ref: ${{ needs.merge.outputs.sha }}
           fetch-depth: 0
-          token: ${{ secrets.SYNC_TOKEN || github.token }}
 
       - name: Fast-forward the default branch
         run: |
@@ -300,7 +288,7 @@ jobs:
       contents: read
       issues: write
     env:
-      GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
+      GH_TOKEN: ${{ github.token }}
       PROBLEM: ${{ needs.merge.outputs.problem }}
       DRY_RUN: ${{ needs.merge.outputs.dry_run }}
       SYNC_BRANCH: ${{ needs.merge.outputs.sync_branch }}
@@ -333,11 +321,6 @@ jobs:
                 echo "git checkout ${BASE_BRANCH} && git merge upstream/${UPSTREAM_BRANCH}"
                 echo "# fix the conflicts, then: git commit && git push"
                 echo '```'
-                ;;
-              workflows)
-                echo "GitHub refused to let the built-in GITHUB_TOKEN push this merge, which changes files in \`.github/workflows/\`, so nothing was merged."
-                echo
-                echo "Either press **Sync fork → Update branch** on ${repo_url} to take these changes in, or add a \`SYNC_TOKEN\` secret (see the top of \`.github/workflows/sync-upstream.yml\`) so that such syncs go through automatically."
                 ;;
               push)
                 echo "The merge could not be pushed to \`${SYNC_BRANCH}\`. See the run log."
