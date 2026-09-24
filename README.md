@@ -77,5 +77,3 @@ Download them again from time to time to stay current.
 
 
 # You Can show your Love here!❤️ https://patreon.com/Dossary
-
-## Made in Saudi 🇸🇦
