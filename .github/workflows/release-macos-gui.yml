@@ -42,7 +42,11 @@ jobs:
           version="${TAG#gui-v}"
           app="build/DerivedData/Build/Products/Release/MVTGUI.app"
           mkdir -p dist
-          ditto -c -k --keepParent "$app" "dist/MVT-GUI-${version}-macOS.zip"
+          # The license and notices travel with the app.
+          stage="$RUNNER_TEMP/MVT-GUI-${version}"
+          mkdir -p "$stage"
+          cp -R "$app" LICENSE NOTICE "$stage/"
+          ditto -c -k --keepParent "$stage" "dist/MVT-GUI-${version}-macOS.zip"
           (cd dist && shasum -a 256 ./*.zip > SHA256SUMS.txt)
           echo "VERSION=${version}" >> "$GITHUB_ENV"
 
@@ -63,13 +67,15 @@ jobs:
 
           **Install**
           1. Download \`MVT-GUI-${VERSION}-macOS.zip\` below and unzip it.
-          2. Move \`MVTGUI.app\` to Applications.
+          2. Open the \`MVT-GUI-${VERSION}\` folder and move \`MVTGUI.app\` to Applications.
           3. The app isn't notarized: the first time, right-click it and choose **Open**, then **Open** again.
           4. In the app, open **Setup** to install or update MVT, then **Indicators** to download indicators.
 
           See the [README](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/README.md) for instructions. Check files against \`SHA256SUMS.txt\`.
 
           MVT is for the consensual analysis of devices only; public indicators can't prove a device is clean.
+
+          Licensed under the [MVT License 1.1](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/LICENSE); see [NOTICE](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/NOTICE). Source code: [${TAG}](https://github.com/${GITHUB_REPOSITORY}/tree/${TAG}).
           NOTES
           if gh release view "$TAG" > /dev/null 2>&1; then
             gh release upload "$TAG" dist/* --clobber

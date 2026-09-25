@@ -101,10 +101,7 @@ private struct SidebarHeader<Logo: View>: View {
     }
 }
 
-/// The Android robot's head, drawn in Android green. The Android robot is
-/// reproduced or modified from work created and shared by Google and used
-/// according to terms described in the Creative Commons 3.0 Attribution
-/// License.
+/// The Android robot's head, drawn in Android green (credited in NOTICE).
 struct AndroidLogo: View {
     var body: some View {
         Canvas { context, size in
