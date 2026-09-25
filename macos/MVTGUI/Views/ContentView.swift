@@ -8,17 +8,13 @@ struct ContentView: View {
         NavigationSplitView {
             List(selection: $appState.selection) {
                 Section {
-                    SidebarRow(title: "Setup", systemImage: "wrench.and.screwdriver")
-                        .tag(SidebarItem.setup)
-                    SidebarRow(title: "Indicators", systemImage: "shield.checkered")
-                        .tag(SidebarItem.indicators)
-                    SidebarRow(title: "Results", systemImage: "list.bullet.rectangle")
-                        .tag(SidebarItem.results)
+                    row("Setup", systemImage: "wrench.and.screwdriver", item: .setup)
+                    row("Indicators", systemImage: "shield.checkered", item: .indicators)
+                    row("Results", systemImage: "list.bullet.rectangle", item: .results)
                 }
                 Section {
                     ForEach(MVTCommand.iosCommands) { command in
-                        SidebarRow(title: command.title, systemImage: command.systemImage, color: command.accent)
-                            .tag(SidebarItem.command(command))
+                        row(command.title, systemImage: command.systemImage, item: .command(command), color: command.accent)
                     }
                 } header: {
                     SidebarHeader(title: "iOS") {
@@ -29,8 +25,7 @@ struct ContentView: View {
                 }
                 Section {
                     ForEach(MVTCommand.androidCommands) { command in
-                        SidebarRow(title: command.title, systemImage: command.systemImage, color: command.accent)
-                            .tag(SidebarItem.command(command))
+                        row(command.title, systemImage: command.systemImage, item: .command(command), color: command.accent)
                     }
                 } header: {
                     SidebarHeader(title: "Android") {
@@ -58,6 +53,11 @@ struct ContentView: View {
             }
         }
     }
+
+    private func row(_ title: String, systemImage: String, item: SidebarItem, color: Color? = nil) -> some View {
+        SidebarRow(title: title, systemImage: systemImage, color: color, isSelected: appState.selection == item)
+            .tag(item)
+    }
 }
 
 /// A sidebar row with a slightly larger, coloured icon. The icon turns
@@ -67,8 +67,7 @@ private struct SidebarRow: View {
     let title: String
     let systemImage: String
     var color: Color?
-
-    @Environment(\.backgroundProminence) private var prominence
+    var isSelected = false
 
     var body: some View {
         Label {
@@ -82,7 +81,7 @@ private struct SidebarRow: View {
     }
 
     private var iconStyle: AnyShapeStyle {
-        if let color, prominence != .increased {
+        if let color, !isSelected {
             return AnyShapeStyle(color)
         }
         return AnyShapeStyle(.primary)
