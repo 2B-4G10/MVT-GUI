@@ -1,0 +1,34 @@
+MVT for Mac
+https://github.com/2B-4G10/MVT-GUI
+
+This repository contains:
+
+- MVT, the Mobile Verification Toolkit (src/ and tests/), by The MVT
+  Authors (https://github.com/mvt-project/mvt).
+- MVT for Mac (macos/), a macOS app that runs MVT.
+
+  This Source Code Form is subject to the terms of the MVT License,
+  v. 1.1. If a copy of the MVT License was not distributed with this
+  file, You can obtain one at https://license.mvt.re/1.1/.
+
+Both are covered by the MVT License 1.1 in the LICENSE file. The license
+only allows analysing a device with the consent of its owner or user.
+The source code of every release is available at the address above.
+
+Third-party marks and artwork
+-----------------------------
+
+- The Android robot is reproduced or modified from work created and shared
+  by Google and used according to terms described in the Creative Commons
+  3.0 Attribution License (https://creativecommons.org/licenses/by/3.0/).
+- Apple, the Apple logo, iPhone and iOS are trademarks of Apple Inc.
+  Android is a trademark of Google LLC. They are used only to name the
+  platforms the app works with; this project isn't affiliated with or
+  endorsed by Apple or Google.
+
+Indicators
+----------
+
+The app downloads indicators of compromise from mvt-indicators, Amnesty
+International's investigations and Echap's stalkerware-indicators. They
+aren't part of this repository and each keeps its own license.

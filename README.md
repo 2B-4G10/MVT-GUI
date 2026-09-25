@@ -1,7 +1,20 @@
-# MVT for Mac
+<p align="center">
+  <img src="macos/MVTGUI/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" width="128" height="128" alt="MVT for Mac icon">
+</p>
 
-Check iPhones and Android phones for traces of known spyware, without the
-Terminal. **MVT for Mac** is a simple app for the
+<h1 align="center">MVT for Mac</h1>
+
+<p align="center">
+  Check iPhones and Android phones for traces of known spyware, without the Terminal.
+</p>
+
+<p align="center">
+  <a href="https://github.com/2B-4G10/MVT-GUI/releases"><img src="https://img.shields.io/github/v/release/2B-4G10/MVT-GUI?include_prereleases&label=download" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/macOS-13%2B-blue" alt="macOS 13 or newer">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MVT%201.1-green" alt="MVT License 1.1"></a>
+</p>
+
+**MVT for Mac** is a simple app for the
 [Mobile Verification Toolkit (MVT)](https://docs.mvt.re/) by Amnesty
 International's Security Lab.
 
@@ -76,5 +89,13 @@ Download them again from time to time to stay current.
 - The switch at the bottom of the sidebar turns dark mode on or off.
   **Settings → Appearance** can also follow your Mac's setting.
 
+## Support the project
 
-# You Can show your Love here!❤️ https://patreon.com/Dossary
+If MVT for Mac helps you, you can show your love on
+[Patreon](https://patreon.com/Dossary) ❤️
+
+## License
+
+MVT for Mac and MVT are released under the [MVT License 1.1](LICENSE),
+which only allows checking a phone with the consent of its owner or user.
+Credits for third-party artwork and trademarks are in [NOTICE](NOTICE).
