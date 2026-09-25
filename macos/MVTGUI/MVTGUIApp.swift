@@ -15,6 +15,7 @@ struct MVTGUIApp: App {
                 .environmentObject(indicators)
                 .frame(minWidth: 980, minHeight: 660)
                 .onAppear { environment.refresh() }
+                .followsAppearance()
         }
         .commands {
             SidebarCommands()
@@ -23,6 +24,7 @@ struct MVTGUIApp: App {
         Settings {
             SettingsView()
                 .environmentObject(environment)
+                .followsAppearance()
         }
     }
 }

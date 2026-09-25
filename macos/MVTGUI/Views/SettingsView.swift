@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var environment: MVTEnvironment
+    @AppStorage(Appearance.key) private var appearance = Appearance.system
 
     var body: some View {
         Form {
@@ -22,6 +23,13 @@ struct SettingsView: View {
                 }
             } header: {
                 Text("Installation")
+            }
+
+            Section("Appearance") {
+                Picker("Look", selection: $appearance) {
+                    ForEach(Appearance.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
             }
 
             Section("Behavior") {

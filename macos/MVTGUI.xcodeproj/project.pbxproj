@@ -17,6 +17,7 @@
 		5DEF87E0E9A431DD5BE931A5 /* IndicatorsIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCCB06D2A09852E47CC7E20 /* IndicatorsIndex.swift */; };
 		682EC05A395C1ECF286140A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B6C00F877111216236EB6BB /* SettingsView.swift */; };
 		731CBBE5424293BB7A2A0B3A /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3A3D8F1B4C173D1D2A4DCB0 /* ProcessRunner.swift */; };
+		73721EE2BAC15DA63D980893 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A9E54E552DCB48254301 /* Appearance.swift */; };
 		76410B8BE85E6B7E1851F286 /* MVTCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0878887871AEDCE2886DF27 /* MVTCommand.swift */; };
 		76A1AF9B04A7814FE962333B /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFEE73402C205358ADA39B9 /* SetupView.swift */; };
 		7C52592CFB298BEFDC580235 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 59DAA59D477A91E75E0468AF /* Assets.xcassets */; };
@@ -28,6 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0442A9E54E552DCB48254301 /* Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
 		1FCCB06D2A09852E47CC7E20 /* IndicatorsIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorsIndex.swift; sourceTree = "<group>"; };
 		3D58F66F94682F17479DB87A /* CommandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandView.swift; sourceTree = "<group>"; };
 		59DAA59D477A91E75E0468AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				B0878887871AEDCE2886DF27 /* MVTCommand.swift */,
 				61AC4EFEC546B4B08493B9D0 /* CommandForm.swift */,
 				6748648439C3D927188E127A /* AppState.swift */,
+				0442A9E54E552DCB48254301 /* Appearance.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -198,6 +201,7 @@
 				76410B8BE85E6B7E1851F286 /* MVTCommand.swift in Sources */,
 				9145740C3465772C99F91303 /* CommandForm.swift in Sources */,
 				4A5B113E2D0546BB5A8EFD26 /* AppState.swift in Sources */,
+				73721EE2BAC15DA63D980893 /* Appearance.swift in Sources */,
 				3AED9DECCF7F89939B162499 /* LogLine.swift in Sources */,
 				731CBBE5424293BB7A2A0B3A /* ProcessRunner.swift in Sources */,
 				A12D69673388B86CC7B7C96E /* MVTEnvironment.swift in Sources */,

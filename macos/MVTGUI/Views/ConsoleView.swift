@@ -9,7 +9,7 @@ extension LogLevel {
         case .warning: return .orange
         case .error: return .red
         case .infoAlert: return .blue
-        case .lowAlert: return Color(nsColor: .systemYellow)
+        case .lowAlert: return .lowAlertYellow
         case .mediumAlert: return .orange
         case .highAlert, .criticalAlert: return .red
         }
@@ -25,6 +25,16 @@ extension LogLevel {
         default: return ""
         }
     }
+}
+
+extension Color {
+    /// Yellow for low alerts: a deeper amber in light mode, where the system
+    /// yellow is hard to read on white.
+    static let lowAlertYellow = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            ? .systemYellow
+            : NSColor(red: 0.66, green: 0.49, blue: 0, alpha: 1)
+    })
 }
 
 /// Streams the output of the shared ProcessRunner.

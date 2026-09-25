@@ -8,28 +8,34 @@ struct ContentView: View {
         NavigationSplitView {
             List(selection: $appState.selection) {
                 Section {
-                    Label("Setup", systemImage: "wrench.and.screwdriver")
+                    SidebarRow(title: "Setup", systemImage: "wrench.and.screwdriver")
                         .tag(SidebarItem.setup)
-                    Label("Indicators", systemImage: "shield.checkered")
+                    SidebarRow(title: "Indicators", systemImage: "shield.checkered")
                         .tag(SidebarItem.indicators)
-                    Label("Results", systemImage: "list.bullet.rectangle")
+                    SidebarRow(title: "Results", systemImage: "list.bullet.rectangle")
                         .tag(SidebarItem.results)
                 }
-                Section("iOS") {
+                Section {
                     ForEach(MVTCommand.iosCommands) { command in
-                        Label(command.title, systemImage: command.systemImage)
+                        SidebarRow(title: command.title, systemImage: command.systemImage, color: command.accent)
                             .tag(SidebarItem.command(command))
                     }
+                } header: {
+                    SidebarHeader(title: "iOS") {
+                        Image(systemName: "apple.logo")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.primary)
+                    }
                 }
-                Section("Android") {
+                Section {
                     ForEach(MVTCommand.androidCommands) { command in
-                        Label {
-                            Text(command.title)
-                        } icon: {
-                            Image(systemName: command.systemImage)
-                                .foregroundStyle(Color.androidGreen)
-                        }
-                        .tag(SidebarItem.command(command))
+                        SidebarRow(title: command.title, systemImage: command.systemImage, color: command.accent)
+                            .tag(SidebarItem.command(command))
+                    }
+                } header: {
+                    SidebarHeader(title: "Android") {
+                        AndroidLogo()
+                            .frame(width: 17, height: 11)
                     }
                 }
             }
@@ -54,38 +60,143 @@ struct ContentView: View {
     }
 }
 
+/// A sidebar row with a slightly larger, coloured icon. The icon turns
+/// the selection's text colour while its row is highlighted, so it never
+/// blends into the highlight.
+private struct SidebarRow: View {
+    let title: String
+    let systemImage: String
+    var color: Color?
+
+    @Environment(\.backgroundProminence) private var prominence
+
+    var body: some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(systemName: systemImage)
+                .font(.system(size: 15))
+                .foregroundStyle(iconStyle)
+                .frame(width: 22)
+        }
+    }
+
+    private var iconStyle: AnyShapeStyle {
+        if let color, prominence != .increased {
+            return AnyShapeStyle(color)
+        }
+        return AnyShapeStyle(.primary)
+    }
+}
+
+/// A sidebar section title with the platform's logo beside it.
+private struct SidebarHeader<Logo: View>: View {
+    let title: String
+    @ViewBuilder let logo: Logo
+
+    var body: some View {
+        HStack(spacing: 6) {
+            logo
+            Text(title)
+        }
+    }
+}
+
+/// The Android robot's head, drawn in Android green. The Android robot is
+/// reproduced or modified from work created and shared by Google and used
+/// according to terms described in the Creative Commons 3.0 Attribution
+/// License.
+struct AndroidLogo: View {
+    var body: some View {
+        Canvas { context, size in
+            let unit = min(size.width, size.height / 0.62)
+            let origin = CGPoint(x: (size.width - unit) / 2, y: (size.height - unit * 0.62) / 2)
+            func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+                CGPoint(x: origin.x + x * unit, y: origin.y + y * unit)
+            }
+
+            var head = Path()
+            head.addRelativeArc(center: point(0.5, 0.62), radius: 0.46 * unit, startAngle: .degrees(180), delta: .degrees(180))
+            head.closeSubpath()
+
+            var antennae = Path()
+            antennae.move(to: point(0.29, 0.34))
+            antennae.addLine(to: point(0.19, 0.05))
+            antennae.move(to: point(0.71, 0.34))
+            antennae.addLine(to: point(0.81, 0.05))
+
+            let green = GraphicsContext.Shading.color(.androidGreen)
+            context.fill(head, with: green)
+            context.stroke(antennae, with: green, style: StrokeStyle(lineWidth: 0.075 * unit, lineCap: .round))
+
+            let eye = 0.05 * unit
+            var eyes = Path()
+            eyes.addEllipse(in: CGRect(x: point(0.33, 0.46).x - eye, y: point(0.33, 0.46).y - eye, width: eye * 2, height: eye * 2))
+            eyes.addEllipse(in: CGRect(x: point(0.67, 0.46).x - eye, y: point(0.67, 0.46).y - eye, width: eye * 2, height: eye * 2))
+            context.blendMode = .clear
+            context.fill(eyes, with: .color(.black))
+        }
+        .accessibilityLabel("Android")
+    }
+}
+
 private struct MVTStatusFooter: View {
     @EnvironmentObject private var environment: MVTEnvironment
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
-        Button {
-            appState.selection = .setup
-        } label: {
-            HStack(spacing: 6) {
-                switch environment.status {
-                case .found(let version) where environment.isOutdated:
-                    Image(systemName: "arrow.up.circle.fill").foregroundStyle(.orange)
-                    Text("MVT \(version) · update available")
-                case .found(let version):
-                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                    Text("MVT \(version)")
-                case .missing:
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                    Text("MVT not installed")
-                case .checking, .unknown:
-                    ProgressView().controlSize(.small)
-                    Text("Looking for MVT…")
+        HStack(spacing: 8) {
+            Button {
+                appState.selection = .setup
+            } label: {
+                HStack(spacing: 6) {
+                    switch environment.status {
+                    case .found(let version) where environment.isOutdated:
+                        Image(systemName: "arrow.up.circle.fill").foregroundStyle(.orange)
+                        Text("MVT \(version) · update available")
+                    case .found(let version):
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Text("MVT \(version)")
+                    case .missing:
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        Text("MVT not installed")
+                    case .checking, .unknown:
+                        ProgressView().controlSize(.small)
+                        Text("Looking for MVT…")
+                    }
+                    Spacer(minLength: 0)
                 }
-                Spacer()
+                .font(.caption)
+                .lineLimit(1)
+                .contentShape(Rectangle())
             }
-            .font(.caption)
-            .lineLimit(1)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+
+            DarkModeSwitch()
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+}
+
+/// Switches the app between light and dark. Settings also offers
+/// following the system.
+private struct DarkModeSwitch: View {
+    @AppStorage(Appearance.key) private var appearance = Appearance.system
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Toggle(isOn: Binding(
+            get: { colorScheme == .dark },
+            set: { appearance = $0 ? .dark : .light }
+        )) {
+            Image(systemName: colorScheme == .dark ? "moon.fill" : "sun.max.fill")
+                .foregroundStyle(.secondary)
+                .frame(width: 14)
+        }
+        .toggleStyle(.switch)
+        .controlSize(.mini)
+        .help(colorScheme == .dark ? "Switch to light mode" : "Switch to dark mode")
     }
 }
 
@@ -95,7 +206,7 @@ extension Color {
 }
 
 extension MVTCommand {
-    /// The accent for a command's screen: Android green for Android tools,
-    /// the app's accent colour otherwise.
-    var accent: Color { tool == .android ? .androidGreen : .accentColor }
+    /// The colour of a command's icon and Run button: blue for iOS tools,
+    /// Android green for Android tools.
+    var accent: Color { tool == .android ? .androidGreen : .blue }
 }
