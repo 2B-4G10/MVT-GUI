@@ -73,6 +73,8 @@ Download them again from time to time to stay current.
   ones you pick, or your own STIX2 files.
 - **Re-check Results** compares old results against newer indicators,
   without the phone.
+- The switch at the bottom of the sidebar turns dark mode on or off.
+  **Settings → Appearance** can also follow your Mac's setting.
 
 
 # You Can show your Love here!❤️ https://patreon.com/Dossary
