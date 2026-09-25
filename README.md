@@ -73,7 +73,6 @@ Download them again from time to time to stay current.
   ones you pick, or your own STIX2 files.
 - **Re-check Results** compares old results against newer indicators,
   without the phone.
-- Passwords go to MVT privately and never appear on the command line.
 
 
 # You Can show your Love here!❤️ https://patreon.com/Dossary
