@@ -38,6 +38,6 @@ Screens: `setup`, `indicators`, `results`, or a command name such as
   - This fork's README is always kept.
   - **Actions → Sync upstream → Run workflow** syncs now. It has a dry-run
     option.
-- **Release macOS app:** run it with a version such as `2.0.0-beta`. It
+- **Release macOS app:** run it with a version such as `3.0.0-beta`. It
   builds the app, tags the commit `gui-v<version>` and publishes a release.
 - **Screenshots:** captures the app's screens into `screenshots/`.
