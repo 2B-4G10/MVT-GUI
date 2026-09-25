@@ -1,6 +1,6 @@
 name: Release macOS app
 # Builds the macOS app and publishes it as a GitHub release, either when a
-# gui-v* tag is pushed (e.g. gui-v2.0.0-alpha) or when started from the
+# gui-v* tag is pushed (e.g. gui-v3.0.0-alpha) or when started from the
 # Actions tab with a version, which tags the chosen commit. Tags containing alpha, beta or rc
 # are marked as pre-releases. The tags are prefixed so they never mix with
 # MVT's own v* release tags, which set MVT's version number.
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release, e.g. 2.0.0-alpha (tagged gui-v<version>)
+        description: Version to release, e.g. 3.0.0-alpha (tagged gui-v<version>)
         required: true
 
 permissions:
@@ -51,7 +51,13 @@ jobs:
           prerelease=()
           case "$TAG" in *alpha*|*beta*|*rc*) prerelease=(--prerelease) ;; esac
           title="MVT GUI ${VERSION}"
-          case "$VERSION" in 2.0.0-alpha) title="MVT GUI V2-Alpha" ;; esac
+          # A major pre-release such as 3.0.0-alpha is titled "MVT GUI V3-Alpha".
+          case "$VERSION" in
+            *.0.0-*)
+              pre="${VERSION#*-}"
+              title="MVT GUI V${VERSION%%.*}-$(echo "${pre:0:1}" | tr '[:lower:]' '[:upper:]')${pre:1}"
+              ;;
+          esac
           cat > notes.md <<NOTES
           A Mac app for the Mobile Verification Toolkit (MVT). Requires macOS 13 or newer.
 
