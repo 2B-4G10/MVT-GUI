@@ -59,6 +59,8 @@ Download them again from time to time to stay current.
 4. Press **Decrypt**, then **Check Decrypted Backup**.
 5. Choose a **Results folder** and press **Run Check**.
 
+![Checking an iPhone backup](macos/screenshots/check-backup.png)
+
 ## Check an Android phone
 
 1. Collect the phone's data with
@@ -67,6 +69,8 @@ Download them again from time to time to stay current.
    folder.
 3. Choose a **Results folder** and press **Run Check**.
 
+![Checking an AndroidQF acquisition](macos/screenshots/check-androidqf.png)
+
 ## Read the results
 
 1. Press **View Results** when the check finishes, or open **Results** and
@@ -74,6 +78,8 @@ Download them again from time to time to stay current.
 2. Alerts are sorted by severity: **Critical**, **High**, **Medium**,
    **Low**, **Info**.
 3. Click an alert to see what triggered it.
+
+![The Results screen](macos/screenshots/results.png)
 
 > **No alerts doesn't mean a phone is clean.** Public indicators miss new
 > and targeted attacks. If you're worried, get expert help from
