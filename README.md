@@ -2,10 +2,10 @@
   <img src="macos/MVTGUI/Assets.xcassets/AppIcon.appiconset/icon_128x128@2x.png" width="128" height="128" alt="MVT for Mac icon">
 </p>
 
-<h1 align="center">MVT for Mac</h1>
+<h1 align="center">MVT Graphical UI</h1>
 
 <p align="center">
-  Check iPhones and Android phones for traces of known spyware, without the Terminal.
+  Check iPhones and Android phones for traces of known spyware, without the Terminal!
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MVT%201.1-green" alt="MVT License 1.1"></a>
 </p>
 
-**MVT for Mac** is a simple app for the
+**MVT GUI** is a simple app for the
 [Mobile Verification Toolkit (MVT)](https://docs.mvt.re/) by Amnesty
 International's Security Lab.
 
