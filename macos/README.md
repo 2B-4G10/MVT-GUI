@@ -23,6 +23,12 @@ The user guide is in the [main README](../README.md).
 To add an MVT option, add it to `MVTCommand`, map it in
 `CommandForm.invocation()`, and list its flags in `check_cli_contract.py`.
 
+After adding or removing a Swift file, run
+`python3 scripts/generate_xcodeproj.py` to update the Xcode project. Before a
+release, set the app's version with
+`python3 scripts/generate_xcodeproj.py --version 3.1.0`, which also raises the
+build number.
+
 The app can open on a given screen:
 `MVTGUI.app/Contents/MacOS/MVTGUI -startScreen results -resultsFolder <path>`.
 Screens: `setup`, `indicators`, `results`, or a command name such as

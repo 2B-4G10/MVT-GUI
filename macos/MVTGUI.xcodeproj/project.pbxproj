@@ -93,10 +93,10 @@
 		A1C86A29E589D48EC70B6A32 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B0878887871AEDCE2886DF27 /* MVTCommand.swift */,
-				61AC4EFEC546B4B08493B9D0 /* CommandForm.swift */,
 				6748648439C3D927188E127A /* AppState.swift */,
 				0442A9E54E552DCB48254301 /* Appearance.swift */,
+				61AC4EFEC546B4B08493B9D0 /* CommandForm.swift */,
+				B0878887871AEDCE2886DF27 /* MVTCommand.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -104,10 +104,10 @@
 		609874F33224C0C09F1FEE42 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				63D525780C292FCAE7B78805 /* LogLine.swift */,
-				A3A3D8F1B4C173D1D2A4DCB0 /* ProcessRunner.swift */,
-				E64BE69E4AF9D731CAC9A20B /* MVTEnvironment.swift */,
 				1FCCB06D2A09852E47CC7E20 /* IndicatorsIndex.swift */,
+				63D525780C292FCAE7B78805 /* LogLine.swift */,
+				E64BE69E4AF9D731CAC9A20B /* MVTEnvironment.swift */,
+				A3A3D8F1B4C173D1D2A4DCB0 /* ProcessRunner.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -115,15 +115,15 @@
 		38DF21AEF4612506D6BE5CBE /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				68ABBBA3718C0BB762BCA03D /* ContentView.swift */,
 				3D58F66F94682F17479DB87A /* CommandView.swift */,
 				A0998487C259E497911320B9 /* ConsoleView.swift */,
+				68ABBBA3718C0BB762BCA03D /* ContentView.swift */,
+				D3367BFAB3A3E0C96F978FE7 /* IndicatorPicker.swift */,
+				5F34A420E628113DE50B7D66 /* IndicatorsView.swift */,
 				D39D430219C3F40235687B79 /* PathField.swift */,
 				5A5344D69BAE7D0123D11DE6 /* ResultsView.swift */,
-				6BFEE73402C205358ADA39B9 /* SetupView.swift */,
 				9B6C00F877111216236EB6BB /* SettingsView.swift */,
-				5F34A420E628113DE50B7D66 /* IndicatorsView.swift */,
-				D3367BFAB3A3E0C96F978FE7 /* IndicatorPicker.swift */,
+				6BFEE73402C205358ADA39B9 /* SetupView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -198,23 +198,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				214513774910EC79E6019EBF /* MVTGUIApp.swift in Sources */,
-				76410B8BE85E6B7E1851F286 /* MVTCommand.swift in Sources */,
-				9145740C3465772C99F91303 /* CommandForm.swift in Sources */,
 				4A5B113E2D0546BB5A8EFD26 /* AppState.swift in Sources */,
 				73721EE2BAC15DA63D980893 /* Appearance.swift in Sources */,
-				3AED9DECCF7F89939B162499 /* LogLine.swift in Sources */,
-				731CBBE5424293BB7A2A0B3A /* ProcessRunner.swift in Sources */,
-				A12D69673388B86CC7B7C96E /* MVTEnvironment.swift in Sources */,
+				9145740C3465772C99F91303 /* CommandForm.swift in Sources */,
+				76410B8BE85E6B7E1851F286 /* MVTCommand.swift in Sources */,
 				5DEF87E0E9A431DD5BE931A5 /* IndicatorsIndex.swift in Sources */,
-				4BE4815B2A4DB6C622DC8053 /* ContentView.swift in Sources */,
+				3AED9DECCF7F89939B162499 /* LogLine.swift in Sources */,
+				A12D69673388B86CC7B7C96E /* MVTEnvironment.swift in Sources */,
+				731CBBE5424293BB7A2A0B3A /* ProcessRunner.swift in Sources */,
 				28333285E5B24500738E9366 /* CommandView.swift in Sources */,
 				E3D5083A6A64C055B7EFC03C /* ConsoleView.swift in Sources */,
+				4BE4815B2A4DB6C622DC8053 /* ContentView.swift in Sources */,
+				2C0706D4A6971F8412A52820 /* IndicatorPicker.swift in Sources */,
+				B3C5BBF0C9D80ADBFC6CE209 /* IndicatorsView.swift in Sources */,
 				E64BF3F8B74634481B94D309 /* PathField.swift in Sources */,
 				5D22A070D0088FC21C3A788B /* ResultsView.swift in Sources */,
-				76A1AF9B04A7814FE962333B /* SetupView.swift in Sources */,
 				682EC05A395C1ECF286140A1 /* SettingsView.swift in Sources */,
-				B3C5BBF0C9D80ADBFC6CE209 /* IndicatorsView.swift in Sources */,
-				2C0706D4A6971F8412A52820 /* IndicatorPicker.swift in Sources */,
+				76A1AF9B04A7814FE962333B /* SetupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
