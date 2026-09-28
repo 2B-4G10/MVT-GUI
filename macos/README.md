@@ -41,3 +41,7 @@ Screens: `setup`, `indicators`, `results`, or a command name such as
 - **Release macOS app:** run it with a version such as `3.0.0-beta`. It
   builds the app, tags the commit `gui-v<version>` and publishes a release.
 - **Screenshots:** captures the app's screens into `screenshots/`.
+- **Weekly check:** every Monday, looks for newer GitHub Actions, audits
+  MVT's locked dependencies, checks the latest MVT on PyPI against the app,
+  confirms the upstream sync is current and builds the app. A failed run
+  emails you. `scripts/check_updates.py --apply` updates the actions.

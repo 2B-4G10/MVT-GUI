@@ -1,0 +1,133 @@
+name: Weekly check
+# Once a week, checks everything this fork depends on:
+#
+# - GitHub Actions: finds newer versions of the actions the workflows use
+#   (macos/scripts/check_updates.py) and lists them. GitHub doesn't let the
+#   built-in token edit workflows, so they're applied by the weekly
+#   maintenance, or here when a MAINTENANCE_TOKEN secret is set: a
+#   fine-grained personal access token for this repository with Contents and
+#   Workflows set to "Read and write".
+# - MVT's dependencies: audits the locked Python packages for known
+#   vulnerabilities. uv.lock comes from upstream, so fixes arrive with the
+#   daily sync.
+# - The MVT release people install: checks the latest MVT on PyPI still has
+#   everything the app uses.
+# - The upstream sync: fails if the fork has fallen behind mvt-project/mvt.
+# - The app: builds it with the newest Xcode on GitHub's macOS runners.
+#
+# Anything that needs attention fails the run, so GitHub emails you. Each
+# run's summary lists what was found.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-check
+
+env:
+  BASE_BRANCH: ${{ github.event.repository.default_branch || github.ref_name }}
+
+jobs:
+  actions:
+    name: GitHub Actions versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          token: ${{ secrets.MAINTENANCE_TOKEN || github.token }}
+
+      - name: Find newer versions
+        id: check
+        run: python3 macos/scripts/check_updates.py --apply | tee "$RUNNER_TEMP/updates.md"
+
+      - name: Check the updated workflows
+        if: steps.check.outputs.outdated != '0'
+        run: |
+          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+
+      - name: Push the updates
+        if: steps.check.outputs.outdated != '0'
+        env:
+          HAS_TOKEN: ${{ secrets.MAINTENANCE_TOKEN != '' }}
+        run: |
+          if [ "$HAS_TOKEN" != "true" ]; then
+            echo "::warning::Newer GitHub Actions are available (listed in the summary). Without a MAINTENANCE_TOKEN secret they're left for the weekly maintenance to apply."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -am "Update GitHub Actions" -m "$(grep '^- ' "$RUNNER_TEMP/updates.md")"
+          git push origin "HEAD:${BASE_BRANCH}"
+          echo "Pushed the updates to \`${BASE_BRANCH}\`." >> "$GITHUB_STEP_SUMMARY"
+
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+      - uses: astral-sh/setup-uv@v10.2.0
+      - name: Audit the locked packages
+        run: |
+          uv export --locked --no-dev --no-emit-project --format requirements-txt > requirements.txt
+          {
+            echo "### Dependency audit"
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          uvx pip-audit --strict --disable-pip --no-deps -r requirements.txt > audit.txt 2>&1 || status=$?
+          cat audit.txt
+          { cat audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+  pypi-release:
+    name: Latest MVT release works with the app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install MVT from PyPI
+        run: |
+          pip install mvt
+          echo "### MVT on PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checked MVT $(pip show mvt | sed -n 's/^Version: //p')." >> "$GITHUB_STEP_SUMMARY"
+      - name: Check CLI contract
+        run: python macos/scripts/check_cli_contract.py
+
+  sync:
+    name: Upstream sync is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          fetch-depth: 0
+      - name: Compare with mvt-project/mvt
+        run: |
+          git fetch --no-tags https://github.com/mvt-project/mvt.git +refs/heads/main:refs/remotes/upstream/main
+          behind=$(git rev-list --count HEAD..upstream/main)
+          newest=$(git log -1 --format=%ct upstream/main)
+          echo "### Upstream sync" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`${BASE_BRANCH}\` is ${behind} commit(s) behind mvt-project/mvt." >> "$GITHUB_STEP_SUMMARY"
+          # The daily sync gets a day's grace for commits made since it last ran.
+          if [ "$behind" != "0" ] && [ $(( $(date +%s) - newest )) -gt 172800 ]; then
+            echo "::error::The fork is behind mvt-project/mvt. Check the Sync upstream runs."
+            exit 1
+          fi
+
+  build:
+    name: App
+    uses: ./.github/workflows/macos-gui.yml
