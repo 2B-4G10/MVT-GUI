@@ -25,7 +25,7 @@ International's Security Lab.
 |:-:|---|:-:|---|
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg" width="24" height="24" alt="Windows logo"> | **Windows** 10 and 11 (64-bit) | ✅ | Portable app, MVT included ([see below](#windows)) |
 | <img src="https://cdn.simpleicons.org/apple/000000/ffffff" width="24" height="24" alt="Apple logo"> | **macOS** 13 Ventura or newer | ✅ | Mac app ([Get the app](#get-the-app)) |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="24" height="24" alt="Linux logo"> | **Linux** | ✅ | Run from source ([windows/README.md](windows/README.md#run-it-from-a-checkout)) |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="24" height="24" alt="Linux logo"> | **Linux** | ❌ | Not supported yet |
 
 <p align="center">
   <img src="macos/screenshots/setup.png" width="70%" alt="The Setup screen">
@@ -74,7 +74,9 @@ controlled folder access.
    - If your MVT is out of date, press **Update MVT**.
 2. Open **Indicators** and press **Download All**.
 
-![The Indicators screen](macos/screenshots/indicators.png)
+<p align="center">
+  <img src="macos/screenshots/indicators.png" width="70%" alt="The Indicators screen">
+</p>
 
 Indicators are lists of known spyware traces. The app downloads them from
 the official sources:
@@ -95,7 +97,9 @@ Download them again from time to time to stay current.
 4. Press **Decrypt**, then **Check Decrypted Backup**.
 5. Choose a **Results folder** and press **Run Check**.
 
-![Checking an iPhone backup](macos/screenshots/check-backup.png)
+<p align="center">
+  <img src="macos/screenshots/check-backup.png" width="70%" alt="Checking an iPhone backup">
+</p>
 
 ## Check an Android phone
 
@@ -105,7 +109,9 @@ Download them again from time to time to stay current.
    folder.
 3. Choose a **Results folder** and press **Run Check**.
 
-![Checking an AndroidQF acquisition](macos/screenshots/check-androidqf.png)
+<p align="center">
+  <img src="macos/screenshots/check-androidqf.png" width="70%" alt="Checking an AndroidQF acquisition">
+</p>
 
 ## Read the results
 
@@ -115,7 +121,9 @@ Download them again from time to time to stay current.
    **Low**, **Info**.
 3. Click an alert to see what triggered it.
 
-![The Results screen](macos/screenshots/results.png)
+<p align="center">
+  <img src="macos/screenshots/results.png" width="70%" alt="The Results screen">
+</p>
 
 > **No alerts doesn't mean a phone is clean.** Public indicators miss new
 > and targeted attacks. If you're worried, get expert help from
