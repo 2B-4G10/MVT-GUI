@@ -1,0 +1,127 @@
+name: Windows app
+# Tests the Windows app, builds the portable folder on Windows and tries it:
+# MVT checks the test backup with the app's own Python, and the app opens
+# from "MVT for Windows.exe" and saves a picture of its Results screen.
+
+on:
+  push:
+    paths:
+      - "windows/**"
+      - "src/**"
+      - "pyproject.toml"
+      - "macos/scripts/check_cli_contract.py"
+      - ".github/workflows/windows-app.yml"
+  pull_request:
+    paths:
+      - "windows/**"
+      - "src/**"
+      - "pyproject.toml"
+      - "macos/scripts/check_cli_contract.py"
+      - ".github/workflows/windows-app.yml"
+  workflow_dispatch:
+  # Also run by the weekly check and the release.
+  workflow_call:
+    inputs:
+      version:
+        description: The app's version (defaults to windows/mvtwin/__init__.py)
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test the app on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # setuptools-scm derives the version from git history
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install MVT from this checkout, Qt and pytest
+        run: |
+          $pyside = (Select-String -Path windows/scripts/build_portable.py -Pattern 'PYSIDE_VERSION = "(.*)"').Matches[0].Groups[1].Value
+          python -m pip install --quiet . "PySide6-Essentials==$pyside" pytest
+      - name: Run the tests
+        working-directory: windows
+        run: python -m pytest -v
+
+  build:
+    name: Build the portable app
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Build
+        run: |
+          python -m pip install --quiet pefile
+          $version = "${{ inputs.version }}"
+          if ($version) { python windows/scripts/build_portable.py --version $version }
+          else { python windows/scripts/build_portable.py }
+
+      - name: Check the signatures Windows sees
+        run: |
+          $app = "dist/MVT for Windows"
+          foreach ($file in @("MVT for Windows.exe", "python.exe", "python314.dll", "Lib/site-packages/PySide6/Qt6Core.dll")) {
+            $signature = Get-AuthenticodeSignature -FilePath (Join-Path $app $file)
+            "{0}: {1} ({2})" -f $file, $signature.Status, $signature.SignerCertificate.Subject
+            if ($signature.Status -ne "Valid") { throw "$file isn't validly signed" }
+          }
+
+      - name: Run MVT with the app's Python
+        run: |
+          $python = "dist/MVT for Windows/python.exe"
+          $out = "$env:RUNNER_TEMP/Results"
+          & $python -c "import sys; sys.argv[0] = 'mvt-ios'; from mvt.ios import main; sys.exit(main())" `
+            --disable-update-check --disable-indicator-update-check check-backup `
+            --iocs tests/artifacts/stix2/cytrox.stix2 --output $out tests/artifacts/ios_backup
+          if ($LASTEXITCODE -ne 0) { throw "check-backup failed" }
+          if (-not (Test-Path "$out/alerts.json")) { throw "no alerts.json" }
+          $alerts = Get-Content "$out/alerts.json" -Raw | ConvertFrom-Json
+          "check-backup wrote $($alerts.Count) alerts"
+          if ($alerts.Count -lt 1) { throw "no alerts for the test backup" }
+
+      - name: Open the app from its executable
+        run: |
+          $shots = "$env:RUNNER_TEMP/screenshots"
+          New-Item -ItemType Directory -Force $shots | Out-Null
+          $env:MVTWIN_SCREENSHOT_DELAY = "12"
+          $exe = Resolve-Path "dist/MVT for Windows/MVT for Windows.exe"
+          $screens = @(
+            @{ name = "setup"; args = @("-startScreen", "setup") },
+            @{ name = "indicators"; args = @("-startScreen", "indicators") },
+            @{ name = "check-backup"; args = @("-startScreen", "iosCheckBackup", "-inputPath", "$PWD\tests\artifacts\ios_backup", "-outputPath", "$env:RUNNER_TEMP\Results") },
+            @{ name = "results"; args = @("-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results") },
+            @{ name = "results-dark"; args = @("-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results", "-appearance", "dark") }
+          )
+          foreach ($screen in $screens) {
+            $png = Join-Path $shots "$($screen.name).png"
+            # The launcher starts the app and exits straight away.
+            Start-Process -FilePath $exe -ArgumentList ($screen.args + @("-screenshot", "`"$png`"") | ForEach-Object { if ($_ -match ' ' -and $_ -notmatch '^"') { "`"$_`"" } else { $_ } })
+            $deadline = (Get-Date).AddSeconds(90)
+            while (-not (Test-Path $png) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
+            if (-not (Test-Path $png)) {
+              Get-ChildItem "dist/MVT for Windows/Data" -ErrorAction SilentlyContinue
+              Get-Content "dist/MVT for Windows/Data/error.log" -ErrorAction SilentlyContinue
+              throw "The app didn't open ($($screen.name))"
+            }
+            Start-Sleep -Seconds 2
+            "$($screen.name): $((Get-Item $png).Length) bytes"
+          }
+          # Leave the folder as it was built.
+          Remove-Item -Recurse -Force "dist/MVT for Windows/Data" -ErrorAction SilentlyContinue
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-screenshots
+          path: ${{ runner.temp }}/screenshots
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MVT-for-Windows
+          path: dist/MVT-for-Windows-*.zip

@@ -51,7 +51,7 @@ env:
     CONTRIBUTING.md SECURITY.md MANIFEST.in .safety-policy.yml Makefile .github/dependabot.yml
   # The only workflows this fork runs; any other workflow upstream adds or
   # changes is dropped from merges.
-  FORK_WORKFLOWS: macos-gui.yml sync-upstream.yml release-macos-gui.yml screenshots.yml weekly-check.yml
+  FORK_WORKFLOWS: macos-gui.yml windows-app.yml sync-upstream.yml release-apps.yml screenshots.yml weekly-check.yml
 
 jobs:
   merge:

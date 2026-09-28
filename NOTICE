@@ -6,14 +6,22 @@ This repository contains:
 - MVT, the Mobile Verification Toolkit (src/ and tests/), by The MVT
   Authors (https://github.com/mvt-project/mvt).
 - MVT for Mac (macos/), a macOS app that runs MVT.
+- MVT for Windows (windows/), a Windows app that runs MVT.
 
   This Source Code Form is subject to the terms of the MVT License,
   v. 1.1. If a copy of the MVT License was not distributed with this
   file, You can obtain one at https://license.mvt.re/1.1/.
 
-Both are covered by the MVT License 1.1 in the LICENSE file. The license
+All three are covered by the MVT License 1.1 in the LICENSE file. The license
 only allows analysing a device with the consent of its owner or user.
 The source code of every release is available at the address above.
+
+The Windows app's download also contains Python (Python Software
+Foundation License, in Lib\PYTHON-LICENSE.txt), Qt and PySide6 (GNU LGPL
+v3; their licenses are in Lib\site-packages) and the Python packages MVT
+uses, each under its own license, which is in its folder in
+Lib\site-packages. Their source code is available from python.org,
+qt.io and pypi.org.
 
 Third-party marks and artwork
 -----------------------------
@@ -22,9 +30,10 @@ Third-party marks and artwork
   by Google and used according to terms described in the Creative Commons
   3.0 Attribution License (https://creativecommons.org/licenses/by/3.0/).
 - Apple, the Apple logo, iPhone and iOS are trademarks of Apple Inc.
-  Android is a trademark of Google LLC. They are used only to name the
+  Android is a trademark of Google LLC. Windows is a trademark of Microsoft
+  Corporation. They are used only to name the
   platforms the app works with; this project isn't affiliated with or
-  endorsed by Apple or Google.
+  endorsed by Apple, Google or Microsoft.
 
 Indicators
 ----------

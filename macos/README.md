@@ -44,8 +44,9 @@ Screens: `setup`, `indicators`, `results`, or a command name such as
   - This fork's README is always kept.
   - **Actions → Sync upstream → Run workflow** syncs now. It has a dry-run
     option.
-- **Release macOS app:** run it with a version such as `3.0.0-beta`. It
-  builds the app, tags the commit `gui-v<version>` and publishes a release.
+- **Release apps:** run it with a version such as `3.0.0-beta`. It builds
+  the Mac app and the Windows app ([windows/](../windows/README.md)), tags
+  the commit `gui-v<version>` and publishes both in one release.
 - **Screenshots:** captures the app's screens into `screenshots/`.
 - **Weekly check:** every Monday, looks for newer GitHub Actions, audits
   MVT's locked dependencies, checks the latest MVT on PyPI against the app,
