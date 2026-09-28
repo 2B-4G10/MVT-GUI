@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/2B-4G10/MVT-GUI/releases"><img src="https://img.shields.io/github/v/release/2B-4G10/MVT-GUI?include_prereleases&label=download" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/macOS-13%2B-blue" alt="macOS 13 or newer">
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-blue" alt="Windows 10 or 11">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MVT%201.1-green" alt="MVT License 1.1"></a>
 </p>
 
@@ -31,6 +32,30 @@ International's Security Lab.
 
 You need macOS 13 Ventura or newer, and Python 3.10 or newer
 (`brew install python`).
+
+## Windows
+
+There's also a portable app for Windows 10 and 11 (64-bit), with MVT
+included:
+
+1. Download the latest `MVT-for-Windows-….zip` from
+   [Releases](https://github.com/2B-4G10/MVT-GUI/releases).
+2. Unzip it into Documents, your Desktop or a USB drive.
+3. Open the **MVT for Windows** folder and double-click
+   **MVT for Windows.exe**. Nothing is installed, and no administrator
+   rights are needed. To remove it, delete the folder.
+
+The app starts through Python's own signed launcher, so Windows Security
+and SmartScreen don't block it. MVT is already installed: skip **Install
+MVT** below. When a newer MVT is out, **Setup** offers **Update MVT**.
+Settings and indicators are kept in the folder's `Data` folder.
+
+Everything else works as described below. On Windows, iPhone backups are
+made with the **Apple Devices** app (or iTunes) and saved in
+`%USERPROFILE%\Apple\MobileSync\Backup` or
+`%APPDATA%\Apple Computer\MobileSync\Backup`. AndroidQF has a Windows
+version. `README.txt` in the folder covers Smart App Control and
+controlled folder access.
 
 ## Set it up (once)
 

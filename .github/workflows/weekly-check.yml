@@ -6,14 +6,16 @@ name: Weekly check
 #   built-in token edit workflows, so they're applied by the weekly
 #   maintenance, or here when a MAINTENANCE_TOKEN secret is set: a
 #   fine-grained personal access token for this repository with Contents and
-#   Workflows set to "Read and write".
+#   Workflows set to "Read and write". The same script finds newer Python,
+#   PySide6 and pip releases for the Windows app.
 # - MVT's dependencies: audits the locked Python packages for known
 #   vulnerabilities. uv.lock comes from upstream, so fixes arrive with the
 #   daily sync.
 # - The MVT release people install: checks the latest MVT on PyPI still has
 #   everything the app uses.
 # - The upstream sync: fails if the fork has fallen behind mvt-project/mvt.
-# - The app: builds it with the newest Xcode on GitHub's macOS runners.
+# - The apps: builds the Mac app with the newest Xcode on GitHub's macOS
+#   runners, and the Windows app with the newest MVT from PyPI.
 #
 # Anything that needs attention fails the run, so GitHub emails you. Each
 # run's summary lists what was found.
@@ -34,7 +36,7 @@ env:
 
 jobs:
   actions:
-    name: GitHub Actions versions
+    name: GitHub Actions and Windows runtime versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -58,12 +60,12 @@ jobs:
           HAS_TOKEN: ${{ secrets.MAINTENANCE_TOKEN != '' }}
         run: |
           if [ "$HAS_TOKEN" != "true" ]; then
-            echo "::warning::Newer GitHub Actions are available (listed in the summary). Without a MAINTENANCE_TOKEN secret they're left for the weekly maintenance to apply."
+            echo "::warning::Updates are available (listed in the summary). Without a MAINTENANCE_TOKEN secret they're left for the weekly maintenance to apply."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -q -am "Update GitHub Actions" -m "$(grep '^- ' "$RUNNER_TEMP/updates.md")"
+          git commit -q -am "Apply the weekly updates" -m "$(grep '^- ' "$RUNNER_TEMP/updates.md")"
           git push origin "HEAD:${BASE_BRANCH}"
           echo "Pushed the updates to \`${BASE_BRANCH}\`." >> "$GITHUB_STEP_SUMMARY"
 
@@ -131,3 +133,7 @@ jobs:
   build:
     name: App
     uses: ./.github/workflows/macos-gui.yml
+
+  windows:
+    name: Windows app
+    uses: ./.github/workflows/windows-app.yml

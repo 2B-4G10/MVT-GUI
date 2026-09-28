@@ -1,5 +1,6 @@
-name: Release macOS app
-# Builds the macOS app and publishes it as a GitHub release, either when a
+name: Release apps
+# Builds the macOS app and the portable Windows app and publishes them as one
+# GitHub release, either when a
 # gui-v* tag is pushed (e.g. gui-v3.0.0-alpha) or when started from the
 # Actions tab with a version, which tags the chosen commit. Tags containing alpha, beta or rc
 # are marked as pre-releases. The tags are prefixed so they never mix with
@@ -18,8 +19,15 @@ permissions:
   contents: write
 
 jobs:
+  windows:
+    name: Windows app
+    uses: ./.github/workflows/windows-app.yml
+    with:
+      version: ${{ inputs.version || github.ref_name }}
+
   release:
     name: Build and publish
+    needs: windows
     runs-on: macos-latest
     env:
       TAG: ${{ inputs.version && format('gui-v{0}', inputs.version) || github.ref_name }}
@@ -47,8 +55,17 @@ jobs:
           mkdir -p "$stage"
           cp -R "$app" LICENSE NOTICE "$stage/"
           ditto -c -k --keepParent "$stage" "dist/MVT-GUI-${version}-macOS.zip"
-          (cd dist && shasum -a 256 ./*.zip > SHA256SUMS.txt)
           echo "VERSION=${version}" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: MVT-for-Windows
+          path: dist
+
+      - name: Checksums
+        run: |
+          (cd dist && shasum -a 256 ./*.zip > SHA256SUMS.txt)
+          cat dist/SHA256SUMS.txt
 
       - name: Publish release
         run: |
@@ -66,13 +83,18 @@ jobs:
               ;;
           esac
           cat > notes.md <<NOTES
-          A Mac app for the Mobile Verification Toolkit (MVT). Requires macOS 13 or newer.
+          Mac and Windows apps for the Mobile Verification Toolkit (MVT).
 
-          **Install**
+          **Mac** (macOS 13 or newer)
           1. Download \`MVT-GUI-${VERSION}-macOS.zip\` below and unzip it.
           2. Open the \`MVT-GUI-${VERSION}\` folder and move \`MVTGUI.app\` to Applications.
           3. The app isn't notarized: the first time, right-click it and choose **Open**, then **Open** again.
           4. In the app, open **Setup** to install or update MVT, then **Indicators** to download indicators.
+
+          **Windows** (Windows 10 or 11, 64-bit; portable, MVT included)
+          1. Download \`MVT-for-Windows-${VERSION}.zip\` below and unzip it into Documents, Desktop or a USB drive.
+          2. Open the \`MVT for Windows\` folder and double-click \`MVT for Windows.exe\`. Nothing is installed.
+          3. In the app, open **Indicators** to download indicators.
 
           See the [README](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/README.md) for instructions. Check files against \`SHA256SUMS.txt\`.
 
