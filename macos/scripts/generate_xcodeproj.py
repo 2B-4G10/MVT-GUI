@@ -3,7 +3,7 @@ macos/MVTGUI/, so adding a Swift file needs no Xcode. Object IDs are hashes of
 file paths, so unchanged files keep their IDs.
 
     python3 macos/scripts/generate_xcodeproj.py                  # after adding or removing files
-    python3 macos/scripts/generate_xcodeproj.py --version 3.1.0  # also bumps the build number
+    python3 macos/scripts/generate_xcodeproj.py --version 4.0.1  # also bumps the build number
 """
 
 import argparse
@@ -16,7 +16,7 @@ APP = ROOT / "MVTGUI"
 PBXPROJ = ROOT / "MVTGUI.xcodeproj" / "project.pbxproj"
 
 parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-parser.add_argument("--version", help="new MARKETING_VERSION, e.g. 3.1.0 (bumps the build number too)")
+parser.add_argument("--version", help="new MARKETING_VERSION, e.g. 4.0.1 (bumps the build number too)")
 parser.add_argument("--build", type=int, help="new CURRENT_PROJECT_VERSION")
 args = parser.parse_args()
 
