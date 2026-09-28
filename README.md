@@ -19,7 +19,17 @@
 [Mobile Verification Toolkit (MVT)](https://docs.mvt.re/) by Amnesty
 International's Security Lab.
 
-![The Setup screen](macos/screenshots/setup.png)
+## Supported systems
+
+| | System | Status | How |
+|:-:|---|:-:|---|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg" width="24" height="24" alt="Windows logo"> | **Windows** 10 and 11 (64-bit) | ✅ | Portable app, MVT included ([see below](#windows)) |
+| <img src="https://cdn.simpleicons.org/apple/000000/ffffff" width="24" height="24" alt="Apple logo"> | **macOS** 13 Ventura or newer | ✅ | Mac app ([Get the app](#get-the-app)) |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="24" height="24" alt="Linux logo"> | **Linux** | ✅ | Run from source ([windows/README.md](windows/README.md#run-it-from-a-checkout)) |
+
+<p align="center">
+  <img src="macos/screenshots/setup.png" width="70%" alt="The Setup screen">
+</p>
 
 ## Get the app
 

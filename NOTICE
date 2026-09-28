@@ -30,10 +30,13 @@ Third-party marks and artwork
   by Google and used according to terms described in the Creative Commons
   3.0 Attribution License (https://creativecommons.org/licenses/by/3.0/).
 - Apple, the Apple logo, iPhone and iOS are trademarks of Apple Inc.
-  Android is a trademark of Google LLC. Windows is a trademark of Microsoft
-  Corporation. They are used only to name the
-  platforms the app works with; this project isn't affiliated with or
-  endorsed by Apple, Google or Microsoft.
+  Android is a trademark of Google LLC. Windows and the Windows logo are
+  trademarks of Microsoft Corporation. Linux is a registered trademark of
+  Linus Torvalds. They are used only to name the platforms the app works
+  with; this project isn't affiliated with or endorsed by Apple, Google,
+  Microsoft or the Linux Foundation.
+- The README shows the Tux penguin, created by Larry Ewing
+  (lewing@isc.tamu.edu) with The GIMP.
 
 Indicators
 ----------
