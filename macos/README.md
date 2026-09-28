@@ -26,7 +26,7 @@ To add an MVT option, add it to `MVTCommand`, map it in
 After adding or removing a Swift file, run
 `python3 scripts/generate_xcodeproj.py` to update the Xcode project. Before a
 release, set the app's version with
-`python3 scripts/generate_xcodeproj.py --version 3.1.0`, which also raises the
+`python3 scripts/generate_xcodeproj.py --version 4.0.1`, which also raises the
 build number.
 
 The app can open on a given screen:
@@ -44,7 +44,7 @@ Screens: `setup`, `indicators`, `results`, or a command name such as
   - This fork's README is always kept.
   - **Actions → Sync upstream → Run workflow** syncs now. It has a dry-run
     option.
-- **Release apps:** run it with a version such as `3.0.0-beta`. It builds
+- **Release apps:** run it with a version such as `4.0.1-beta`. It builds
   the Mac app and the Windows app ([windows/](../windows/README.md)), tags
   the commit `gui-v<version>` and publishes both in one release.
 - **Screenshots:** captures the app's screens into `screenshots/`.

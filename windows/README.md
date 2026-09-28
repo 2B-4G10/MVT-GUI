@@ -62,10 +62,10 @@ and `-screenshot file.png` are also available.
 
 ```
 pip install pefile
-python windows/scripts/build_portable.py --version 3.1.0
+python windows/scripts/build_portable.py --version 4.0.1
 ```
 
-This writes `dist/MVT for Windows/` and `dist/MVT-for-Windows-3.1.0.zip`. On
+This writes `dist/MVT for Windows/` and `dist/MVT-for-Windows-4.0.1.zip`. On
 Windows it also compiles `.pyc` files for a faster start. The script checks
 that every DLL the app loads is in the folder or part of Windows, and that
 the executables are signed. Versions of Python, PySide6 and pip are pinned at

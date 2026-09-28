@@ -1,7 +1,7 @@
 name: Release apps
 # Builds the macOS app and the portable Windows app and publishes them as one
 # GitHub release, either when a
-# gui-v* tag is pushed (e.g. gui-v3.0.0-alpha) or when started from the
+# gui-v* tag is pushed (e.g. gui-v4.0.0-beta) or when started from the
 # Actions tab with a version, which tags the chosen commit. Tags containing alpha, beta or rc
 # are marked as pre-releases. The tags are prefixed so they never mix with
 # MVT's own v* release tags, which set MVT's version number.
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release, e.g. 3.0.0-alpha (tagged gui-v<version>)
+        description: Version to release, e.g. 4.0.1-beta (tagged gui-v<version>)
         required: true
 
 permissions:
@@ -72,8 +72,8 @@ jobs:
           prerelease=()
           case "$TAG" in *alpha*|*beta*|*rc*) prerelease=(--prerelease) ;; esac
           title="MVT GUI ${VERSION}"
-          # Pre-releases are titled by major version: 3.0.0-alpha is
-          # "MVT GUI V3-Alpha" and 3.0.1-alpha is "MVT GUI V3-Alpha (3.0.1)".
+          # Pre-releases are titled by major version: 4.0.0-beta is
+          # "MVT GUI V4-Beta" and 4.0.1-beta is "MVT GUI V4-Beta (4.0.1)".
           case "$VERSION" in
             *-*)
               pre="${VERSION#*-}"

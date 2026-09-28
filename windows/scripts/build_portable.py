@@ -23,7 +23,7 @@ suspicious of PyInstaller-style apps.
 Runs on Windows or, for a quick look, anywhere (then without compiled .pyc
 files):
 
-    python windows/scripts/build_portable.py --version 3.1.0
+    python windows/scripts/build_portable.py --version 4.0.1
 """
 
 from __future__ import annotations
