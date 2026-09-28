@@ -24,7 +24,8 @@ International's Security Lab.
 
 1. Download the latest `MVT-GUI-…-macOS.zip` from
    [Releases](https://github.com/2B-4G10/MVT-GUI/releases).
-2. Unzip it and move **MVTGUI.app** to your **Applications** folder.
+2. Unzip it and move **MVTGUI.app** from the new folder to your
+   **Applications** folder.
 3. The first time only: right-click the app, choose **Open**, then **Open**
    again. The app isn't notarized by Apple.
 
