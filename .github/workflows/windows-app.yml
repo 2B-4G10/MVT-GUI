@@ -86,6 +86,17 @@ jobs:
           "check-backup wrote $($alerts.Count) alerts"
           if ($alerts.Count -lt 1) { throw "no alerts for the test backup" }
 
+      - name: Open the app with its Python
+        run: |
+          $app = Resolve-Path "dist/MVT for Windows"
+          & "$app/python.exe" -c "import sys, sitecustomize; print(sys.executable); print(sys.path); print(sitecustomize.__file__)"
+          if ($LASTEXITCODE -ne 0) { throw "the app's Python can't find its modules" }
+          # The console python.exe shows any error while the window opens.
+          $env:MVTWIN_SCREENSHOT_DELAY = "5"
+          & "$app/python.exe" -m mvtwin -screenshot "$env:RUNNER_TEMP/python-start.png"
+          if (-not (Test-Path "$env:RUNNER_TEMP/python-start.png")) { throw "the app didn't open with python.exe" }
+          Remove-Item -Recurse -Force "$app/Data" -ErrorAction SilentlyContinue
+
       - name: Open the app from its executable
         run: |
           $shots = "$env:RUNNER_TEMP/screenshots"
@@ -108,6 +119,8 @@ jobs:
             if (-not (Test-Path $png)) {
               Get-ChildItem "dist/MVT for Windows/Data" -ErrorAction SilentlyContinue
               Get-Content "dist/MVT for Windows/Data/error.log" -ErrorAction SilentlyContinue
+              Get-Content "dist/MVT for Windows/launch-error.log" -ErrorAction SilentlyContinue
+              Get-Process | Where-Object { $_.Path -like "*MVT for Windows*" } | Format-Table Id, ProcessName, Path
               throw "The app didn't open ($($screen.name))"
             }
             Start-Sleep -Seconds 2
