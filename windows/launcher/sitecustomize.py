@@ -5,6 +5,9 @@ the Python Software Foundation's signature, which Windows trusts. Python
 imports this file whenever it starts. When the renamed executable is started
 without a script, this starts the app in a new process and exits. Every
 other start of Python (MVT's runs, pip) is left alone.
+
+Python reads options that start with "-" before this runs, so the app's own
+options (-startScreen…) only work through python.exe -m mvtwin.
 """
 
 import os
