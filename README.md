@@ -21,11 +21,29 @@ International's Security Lab.
 
 ## Supported systems
 
-| | System | Status | How |
-|:-:|---|:-:|---|
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg" width="24" height="24" alt="Windows logo"> | **Windows** 10 and 11 (64-bit) | ✅ | Portable app, MVT included ([see below](#windows)) |
-| <img src="https://cdn.simpleicons.org/apple/000000/ffffff" width="24" height="24" alt="Apple logo"> | **macOS** 13 Ventura or newer | ✅ | Mac app ([Get the app](#get-the-app)) |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="24" height="24" alt="Linux logo"> | **Linux** | ❌ | Not supported yet |
+<div align="center">
+<table>
+  <tr><th></th><th>System</th><th>Status</th><th>How</th></tr>
+  <tr>
+    <td><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg" width="24" height="24" alt="Windows logo"></td>
+    <td><b>Windows</b> 10 and 11 (64-bit)</td>
+    <td align="center">✅</td>
+    <td>Portable app, MVT included (<a href="#windows">see below</a>)</td>
+  </tr>
+  <tr>
+    <td><img src="https://cdn.simpleicons.org/apple/000000/ffffff" width="24" height="24" alt="Apple logo"></td>
+    <td><b>macOS</b> 13 Ventura or newer</td>
+    <td align="center">✅</td>
+    <td>Mac app (<a href="#get-the-app">Get the app</a>)</td>
+  </tr>
+  <tr>
+    <td><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="24" height="24" alt="Linux logo"></td>
+    <td><b>Linux</b></td>
+    <td align="center">❌</td>
+    <td>Not supported yet</td>
+  </tr>
+</table>
+</div>
 
 <p align="center">
   <img src="macos/screenshots/setup.png" width="70%" alt="The Setup screen">
