@@ -55,7 +55,7 @@ def test_flags_are_in_the_cli_contract():
 
 
 def test_same_commands_as_the_macos_app():
-    swift = (SWIFT / "Models" / "MVTCommand.swift").read_text()
+    swift = (SWIFT / "Models" / "MVTCommand.swift").read_text(encoding="utf-8")
     swift = swift.split("var subcommand: String", 1)[1].split("var title", 1)[0]
     subcommands = dict(re.findall(r"case \.(\w+): return \"([a-z-]+)\"", swift))
     for case in re.findall(r"case \.(\w+), \.(\w+): return \"check-iocs\"", swift):
@@ -66,7 +66,7 @@ def test_same_commands_as_the_macos_app():
 
 
 def test_known_extra_indicator_files_match_the_macos_app():
-    swift = (SWIFT / "Services" / "IndicatorsIndex.swift").read_text()
+    swift = (SWIFT / "Services" / "IndicatorsIndex.swift").read_text(encoding="utf-8")
     assert set(re.findall(r'\(repo: "([^"]+)", path: "([^"]+)"\)', swift)) == set(indicators.KNOWN_EXTRA_FILES)
     repos = re.findall(r'SourceRepository\(owner: "([^"]+)", repo: "([^"]+)", branch: "([^"]+)"', swift)
     assert repos == [(s.owner, s.repo, s.branch) for s in indicators.SOURCE_REPOSITORIES]

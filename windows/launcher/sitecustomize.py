@@ -18,9 +18,19 @@ def _open_app() -> None:
     extra = sys.orig_argv[1:]
     if extra[:2] == ["-m", "mvtwin"]:
         return
-    import subprocess
+    try:
+        import subprocess
 
-    subprocess.Popen([sys.executable, "-m", "mvtwin", *extra], close_fds=True)
+        subprocess.Popen([sys.executable, "-m", "mvtwin", *extra], close_fds=True)
+    except Exception:
+        # There's no console to report to: leave the details next to the app.
+        import traceback
+
+        try:
+            with open(os.path.join(os.path.dirname(sys.executable), "launch-error.log"), "w") as log:
+                traceback.print_exc(file=log)
+        except OSError:
+            pass
     os._exit(0)
 
 
