@@ -99,35 +99,39 @@ jobs:
 
       - name: Open the app from its executable
         run: |
-          $shots = "$env:RUNNER_TEMP/screenshots"
+          $app = Resolve-Path "dist/MVT for Windows"
+          $shots = "$env:RUNNER_TEMP\screenshots"
           New-Item -ItemType Directory -Force $shots | Out-Null
           $env:MVTWIN_SCREENSHOT_DELAY = "12"
-          $exe = Resolve-Path "dist/MVT for Windows/MVT for Windows.exe"
+
+          # A double-click: the launcher starts the app and exits straight away.
+          $env:MVTWIN_SCREENSHOT = "$shots\setup.png"
+          Start-Process -FilePath "$app\MVT for Windows.exe"
+          $deadline = (Get-Date).AddSeconds(90)
+          while (-not (Test-Path $env:MVTWIN_SCREENSHOT) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
+          if (-not (Test-Path $env:MVTWIN_SCREENSHOT)) {
+            Get-Content "$app\Data\error.log", "$app\launch-error.log" -ErrorAction SilentlyContinue
+            throw "The app didn't open from MVT for Windows.exe"
+          }
+          Remove-Item Env:MVTWIN_SCREENSHOT
+          Start-Sleep -Seconds 3
+
+          # The other screens, opened with options through python.exe.
           $screens = @(
-            @{ name = "setup"; args = @("-startScreen", "setup") },
-            @{ name = "indicators"; args = @("-startScreen", "indicators") },
-            @{ name = "check-backup"; args = @("-startScreen", "iosCheckBackup", "-inputPath", "$PWD\tests\artifacts\ios_backup", "-outputPath", "$env:RUNNER_TEMP\Results") },
-            @{ name = "results"; args = @("-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results") },
-            @{ name = "results-dark"; args = @("-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results", "-appearance", "dark") }
+            @("indicators", "-startScreen", "indicators"),
+            @("check-backup", "-startScreen", "iosCheckBackup", "-inputPath", "$PWD\tests\artifacts\ios_backup", "-outputPath", "$env:RUNNER_TEMP\Results"),
+            @("results", "-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results"),
+            @("results-dark", "-startScreen", "results", "-resultsFolder", "$env:RUNNER_TEMP\Results", "-appearance", "dark")
           )
           foreach ($screen in $screens) {
-            $png = Join-Path $shots "$($screen.name).png"
-            # The launcher starts the app and exits straight away.
-            Start-Process -FilePath $exe -ArgumentList ($screen.args + @("-screenshot", "`"$png`"") | ForEach-Object { if ($_ -match ' ' -and $_ -notmatch '^"') { "`"$_`"" } else { $_ } })
-            $deadline = (Get-Date).AddSeconds(90)
-            while (-not (Test-Path $png) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 1 }
-            if (-not (Test-Path $png)) {
-              Get-ChildItem "dist/MVT for Windows/Data" -ErrorAction SilentlyContinue
-              Get-Content "dist/MVT for Windows/Data/error.log" -ErrorAction SilentlyContinue
-              Get-Content "dist/MVT for Windows/launch-error.log" -ErrorAction SilentlyContinue
-              Get-Process | Where-Object { $_.Path -like "*MVT for Windows*" } | Format-Table Id, ProcessName, Path
-              throw "The app didn't open ($($screen.name))"
-            }
-            Start-Sleep -Seconds 2
-            "$($screen.name): $((Get-Item $png).Length) bytes"
+            $png = "$shots\$($screen[0]).png"
+            $options = $screen[1..($screen.Length - 1)]
+            & "$app\python.exe" -m mvtwin @options -screenshot $png
+            if (-not (Test-Path $png)) { throw "The app didn't open ($($screen[0]))" }
           }
+          Get-ChildItem $shots | Format-Table Name, Length
           # Leave the folder as it was built.
-          Remove-Item -Recurse -Force "dist/MVT for Windows/Data" -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force "$app\Data" -ErrorAction SilentlyContinue
 
       - uses: actions/upload-artifact@v7
         with:

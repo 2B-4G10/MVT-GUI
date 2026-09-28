@@ -276,6 +276,9 @@ def parse_arguments(argv: list[str]) -> argparse.Namespace:
     # for the README's screenshots and as a smoke test).
     parser.add_argument("-screenshot")
     args, _unknown = parser.parse_known_args(argv)
+    # "MVT for Windows.exe" can't take these options: Python reads options
+    # starting with "-" itself. Tests pass the screenshot this way instead.
+    args.screenshot = args.screenshot or os.environ.get("MVTWIN_SCREENSHOT")
     return args
 
 
