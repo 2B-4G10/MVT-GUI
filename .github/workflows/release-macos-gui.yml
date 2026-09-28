@@ -55,11 +55,14 @@ jobs:
           prerelease=()
           case "$TAG" in *alpha*|*beta*|*rc*) prerelease=(--prerelease) ;; esac
           title="MVT GUI ${VERSION}"
-          # A major pre-release such as 3.0.0-alpha is titled "MVT GUI V3-Alpha".
+          # Pre-releases are titled by major version: 3.0.0-alpha is
+          # "MVT GUI V3-Alpha" and 3.0.1-alpha is "MVT GUI V3-Alpha (3.0.1)".
           case "$VERSION" in
-            *.0.0-*)
+            *-*)
               pre="${VERSION#*-}"
+              number="${VERSION%%-*}"
               title="MVT GUI V${VERSION%%.*}-$(echo "${pre:0:1}" | tr '[:lower:]' '[:upper:]')${pre:1}"
+              case "$number" in *.0.0) ;; *) title="$title ($number)" ;; esac
               ;;
           esac
           cat > notes.md <<NOTES
