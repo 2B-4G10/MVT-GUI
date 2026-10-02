@@ -35,7 +35,6 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMenu,
     QPlainTextEdit,
-    QSizePolicy,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -134,7 +133,9 @@ class GlyphIconEngine(QIconEngine):
         self.glyph = glyph
         self.color = color
 
-    def paint(self, painter: QPainter, rect: QRect, mode: QIcon.Mode, state: QIcon.State) -> None:
+    def paint(
+        self, painter: QPainter, rect: QRect, mode: QIcon.Mode, state: QIcon.State
+    ) -> None:
         font = icon_font()
         if font is None:
             return
@@ -168,7 +169,11 @@ class GlyphIconEngine(QIconEngine):
 def icon(name: str, color: QColor | str | None = None) -> QIcon:
     if icon_font() is None:
         return QIcon()
-    return QIcon(GlyphIconEngine(GLYPHS[name], QColor(color) if isinstance(color, str) else color))
+    return QIcon(
+        GlyphIconEngine(
+            GLYPHS[name], QColor(color) if isinstance(color, str) else color
+        )
+    )
 
 
 def app_icon() -> QIcon:
@@ -177,7 +182,13 @@ def app_icon() -> QIcon:
     here = Path(__file__).resolve().parent
     folder = here / "resources"
     if not folder.is_dir():
-        folder = here.parents[1] / "macos" / "MVTGUI" / "Assets.xcassets" / "AppIcon.appiconset"
+        folder = (
+            here.parents[1]
+            / "macos"
+            / "MVTGUI"
+            / "Assets.xcassets"
+            / "AppIcon.appiconset"
+        )
     result = QIcon()
     for path in sorted(folder.glob("icon_*.png")):
         result.addFile(str(path))
@@ -186,7 +197,11 @@ def app_icon() -> QIcon:
 
 def android_logo(size: QSize = QSize(17, 11)) -> QPixmap:
     """The Android robot's head, in Android green (credited in NOTICE)."""
-    ratio = QApplication.primaryScreen().devicePixelRatio() if QApplication.primaryScreen() else 1
+    ratio = (
+        QApplication.primaryScreen().devicePixelRatio()
+        if QApplication.primaryScreen()
+        else 1
+    )
     pixmap = QPixmap(size * ratio)
     pixmap.setDevicePixelRatio(ratio)
     pixmap.fill(Qt.GlobalColor.transparent)
@@ -203,7 +218,11 @@ def android_logo(size: QSize = QSize(17, 11)) -> QPixmap:
     radius = 0.46 * unit
     centre = point(0.5, 0.62)
     head.moveTo(centre.x() - radius, centre.y())
-    head.arcTo(QRectF(centre.x() - radius, centre.y() - radius, 2 * radius, 2 * radius), 180, -180)
+    head.arcTo(
+        QRectF(centre.x() - radius, centre.y() - radius, 2 * radius, 2 * radius),
+        180,
+        -180,
+    )
     head.closeSubpath()
     painter.fillPath(head, green)
     pen = QPen(green)
@@ -335,7 +354,14 @@ class PathField(QWidget):
 
     FOLDER, FILE, FILE_OR_FOLDER, SAVE_FILE = range(4)
 
-    def __init__(self, mode: int, placeholder: str = "", default_name: str = "", file_filter: str = "", parent=None):
+    def __init__(
+        self,
+        mode: int,
+        placeholder: str = "",
+        default_name: str = "",
+        file_filter: str = "",
+        parent=None,
+    ):
         super().__init__(parent)
         self.mode = mode
         self.default_name = default_name
@@ -343,7 +369,9 @@ class PathField(QWidget):
         self.setAcceptDrops(True)
 
         self.edit = QLineEdit()
-        self.edit.setPlaceholderText(placeholder or "Type a path, drop it here or press Browse…")
+        self.edit.setPlaceholderText(
+            placeholder or "Type a path, drop it here or press Browse…"
+        )
         self.edit.setClearButtonEnabled(True)
         self.edit.textChanged.connect(self.changed.emit)
 
@@ -366,7 +394,11 @@ class PathField(QWidget):
         layout.addWidget(self.edit, 1)
         layout.addWidget(self.reveal_button)
         layout.addWidget(self.browse)
-        self.changed.connect(lambda text: self.reveal_button.setEnabled(bool(text) and os.path.exists(text)))
+        self.changed.connect(
+            lambda text: self.reveal_button.setEnabled(
+                bool(text) and os.path.exists(text)
+            )
+        )
         self.reveal_button.setEnabled(False)
 
     def path(self) -> str:
@@ -394,10 +426,14 @@ class PathField(QWidget):
             chosen = QFileDialog.getExistingDirectory(self, "Choose a Folder", start)
         elif mode == self.SAVE_FILE:
             chosen, _ = QFileDialog.getSaveFileName(
-                self, "Save As", os.path.join(start, os.path.basename(self.path()) or self.default_name)
+                self,
+                "Save As",
+                os.path.join(start, os.path.basename(self.path()) or self.default_name),
             )
         else:
-            chosen, _ = QFileDialog.getOpenFileName(self, "Choose a File", start, self.file_filter)
+            chosen, _ = QFileDialog.getOpenFileName(
+                self, "Choose a File", start, self.file_filter
+            )
         if chosen:
             self.set_path(chosen)
 
@@ -449,7 +485,9 @@ class ConsoleView(QFrame):
         self.auto_scroll = QCheckBox("Auto-scroll")
         self.auto_scroll.setChecked(True)
         self.copy_button = tool_button("copy", "Copy output", self._copy)
-        self.clear_button = tool_button("delete", "Clear output", lambda: self.runner.clear())
+        self.clear_button = tool_button(
+            "delete", "Clear output", lambda: self.runner.clear()
+        )
 
         header = QHBoxLayout()
         header.setContentsMargins(12, 6, 8, 6)
@@ -490,11 +528,17 @@ class ConsoleView(QFrame):
         runner.line_added.connect(self._add_line)
         runner.cleared.connect(self.render_all)
         runner.state_changed.connect(self.update_header)
-        QGuiApplication.styleHints().colorSchemeChanged.connect(lambda _: self.render_all())
+        QGuiApplication.styleHints().colorSchemeChanged.connect(
+            lambda _: self.render_all()
+        )
         self.update_header()
 
     def _visible(self, level: Level) -> bool:
-        return not self.alerts_only.isChecked() or level.is_alert or level in (Level.ERROR, Level.COMMAND)
+        return (
+            not self.alerts_only.isChecked()
+            or level.is_alert
+            or level in (Level.ERROR, Level.COMMAND)
+        )
 
     def _insert(self, cursor: QTextCursor, text: str, level: Level) -> None:
         fmt = QTextCharFormat()
@@ -543,7 +587,13 @@ class ConsoleView(QFrame):
             self.status.setStyleSheet(f"color: {color.name()}; font-weight: 700;")
         else:
             self.status.setText("")
-        levels = [Level.CRITICAL_ALERT, Level.HIGH_ALERT, Level.MEDIUM_ALERT, Level.LOW_ALERT, Level.INFO_ALERT]
+        levels = [
+            Level.CRITICAL_ALERT,
+            Level.HIGH_ALERT,
+            Level.MEDIUM_ALERT,
+            Level.LOW_ALERT,
+            Level.INFO_ALERT,
+        ]
         for badge, level in zip(self.badges, levels):
             count = runner.alert_counts.get(level, 0)
             badge.setVisible(count > 0)
@@ -553,8 +603,6 @@ class ConsoleView(QFrame):
         self.clear_button.setEnabled(bool(runner.lines) and not runner.is_running)
 
     def _copy(self) -> None:
-        QApplication.clipboard().setText("\n".join(text for text, _ in self.runner.lines))
-
-
-def expanding() -> QSizePolicy:
-    return QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        QApplication.clipboard().setText(
+            "\n".join(text for text, _ in self.runner.lines)
+        )

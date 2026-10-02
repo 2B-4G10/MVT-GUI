@@ -46,7 +46,8 @@ class Context(QObject):
     @property
     def is_outdated(self) -> bool:
         return bool(
-            self.installed_version and self.latest_version
+            self.installed_version
+            and self.latest_version
             and environment.is_older(self.installed_version, self.latest_version)
         )
 
@@ -74,8 +75,10 @@ class Context(QObject):
                 self.runner.note(f"MVT {self.installed_version} is ready.")
 
         self.runner.run(
-            environment.python_executable(), environment.update_arguments(),
-            display="python -m pip install --upgrade mvt", on_finished=finished,
+            environment.python_executable(),
+            environment.update_arguments(),
+            display="python -m pip install --upgrade mvt",
+            on_finished=finished,
         )
 
     # MARK: - Indicators

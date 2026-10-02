@@ -24,7 +24,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 WORKFLOWS = REPO / ".github" / "workflows"
 WINDOWS_BUILD = REPO / "windows" / "scripts" / "build_portable.py"
-USES = re.compile(r"(uses:\s*)([\w.-]+/[\w.-]+)((?:/[\w.-]+)*)@(v\d+(?:\.\d+)*)(?=\s|$)")
+USES = re.compile(
+    r"(uses:\s*)([\w.-]+/[\w.-]+)((?:/[\w.-]+)*)@(v\d+(?:\.\d+)*)(?=\s|$)"
+)
 RELEASE_TAG = re.compile(r"^v(\d+(?:\.\d+)*)$")
 
 
@@ -69,11 +71,14 @@ def pypi_version(package: str) -> str:
 def embeddable_pythons() -> list[str]:
     """Python releases with a Windows embeddable package, newest first."""
     listing = fetch("https://www.python.org/ftp/python/").decode()
-    versions = sorted(set(re.findall(r'href="(3\.\d+\.\d+)/"', listing)), key=version, reverse=True)
+    versions = sorted(
+        set(re.findall(r'href="(3\.\d+\.\d+)/"', listing)), key=version, reverse=True
+    )
     found = []
     for candidate in versions[:12]:
         request = urllib.request.Request(
-            f"https://www.python.org/ftp/python/{candidate}/python-{candidate}-embed-amd64.zip", method="HEAD"
+            f"https://www.python.org/ftp/python/{candidate}/python-{candidate}-embed-amd64.zip",
+            method="HEAD",
         )
         try:
             with urllib.request.urlopen(request, timeout=30):
@@ -86,8 +91,17 @@ def embeddable_pythons() -> list[str]:
 def windows_updates(apply: bool) -> tuple[list[str], list[str]]:
     """Returns (updates, notes) for the Windows app's build."""
     text = WINDOWS_BUILD.read_text()
-    pins = dict(re.findall(r'^(PYTHON_VERSION|PYSIDE_VERSION|PIP_VERSION) = "([^"]+)"', text, re.MULTILINE))
-    newest = {"PYSIDE_VERSION": pypi_version("PySide6-Essentials"), "PIP_VERSION": pypi_version("pip")}
+    pins = dict(
+        re.findall(
+            r'^(PYTHON_VERSION|PYSIDE_VERSION|PIP_VERSION) = "([^"]+)"',
+            text,
+            re.MULTILINE,
+        )
+    )
+    newest = {
+        "PYSIDE_VERSION": pypi_version("PySide6-Essentials"),
+        "PIP_VERSION": pypi_version("pip"),
+    }
     notes = []
     pythons = embeddable_pythons()
     current = pins["PYTHON_VERSION"]
@@ -96,14 +110,24 @@ def windows_updates(apply: bool) -> tuple[list[str], list[str]]:
         newest["PYTHON_VERSION"] = same_minor[0]
     newer_minor = [v for v in pythons if version(v)[:2] > version(current)[:2]]
     if newer_minor:
-        notes.append(f"- Python {newer_minor[0]} is out; the Windows app uses {current}. Move to it by hand "
-                     "once MVT's dependencies have Windows wheels for it.")
+        notes.append(
+            f"- Python {newer_minor[0]} is out; the Windows app uses {current}. Move to it by hand "
+            "once MVT's dependencies have Windows wheels for it."
+        )
     updates = []
-    names = {"PYTHON_VERSION": "Python", "PYSIDE_VERSION": "PySide6", "PIP_VERSION": "pip"}
+    names = {
+        "PYTHON_VERSION": "Python",
+        "PYSIDE_VERSION": "PySide6",
+        "PIP_VERSION": "pip",
+    }
     for key, latest in newest.items():
         if version(latest) > version(pins[key]):
-            updates.append(f"- `{WINDOWS_BUILD.name}`: {names[key]} {pins[key]} → {latest}")
-            text = re.sub(rf'^{key} = "[^"]+"', f'{key} = "{latest}"', text, flags=re.MULTILINE)
+            updates.append(
+                f"- `{WINDOWS_BUILD.name}`: {names[key]} {pins[key]} → {latest}"
+            )
+            text = re.sub(
+                rf'^{key} = "[^"]+"', f'{key} = "{latest}"', text, flags=re.MULTILINE
+            )
     if apply and updates:
         WINDOWS_BUILD.write_text(text)
     return updates, notes
@@ -133,7 +157,9 @@ def main() -> int:
         if args.apply and updated != text:
             workflow.write_text(updated)
 
-    lines = [f"- `{name}`: `{action}` {old} → {new}" for name, action, old, new in updates]
+    lines = [
+        f"- `{name}`: `{action}` {old} → {new}" for name, action, old, new in updates
+    ]
     windows, notes = windows_updates(args.apply)
     report = "\n".join(
         ["### GitHub Actions", ""]

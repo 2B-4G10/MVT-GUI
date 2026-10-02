@@ -25,24 +25,76 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-GLOBAL_OPTIONS = ["--disable-update-check", "--disable-indicator-update-check", "--verbose"]
+GLOBAL_OPTIONS = [
+    "--disable-update-check",
+    "--disable-indicator-update-check",
+    "--verbose",
+]
 
 # (script, command) -> options the GUI passes.
 EXPECTED_OPTIONS = {
-    ("mvt-ios", "check-backup"): ["--iocs", "--output", "--fast", "--hashes", "--module", "--list-modules"],
-    ("mvt-ios", "check-fs"): ["--iocs", "--output", "--fast", "--hashes", "--module", "--list-modules"],
-    ("mvt-ios", "check-sysdiagnose"): ["--iocs", "--output", "--hashes", "--module", "--list-modules"],
-    ("mvt-ios", "decrypt-backup"): ["--destination", "--jobs", "--key-file", "--hashes"],
+    ("mvt-ios", "check-backup"): [
+        "--iocs",
+        "--output",
+        "--fast",
+        "--hashes",
+        "--module",
+        "--list-modules",
+    ],
+    ("mvt-ios", "check-fs"): [
+        "--iocs",
+        "--output",
+        "--fast",
+        "--hashes",
+        "--module",
+        "--list-modules",
+    ],
+    ("mvt-ios", "check-sysdiagnose"): [
+        "--iocs",
+        "--output",
+        "--hashes",
+        "--module",
+        "--list-modules",
+    ],
+    ("mvt-ios", "decrypt-backup"): [
+        "--destination",
+        "--jobs",
+        "--key-file",
+        "--hashes",
+    ],
     ("mvt-ios", "extract-key"): ["--key-file"],
     ("mvt-ios", "check-iocs"): ["--iocs", "--module", "--list-modules"],
     ("mvt-ios", "version"): [],
     ("mvt-android", "check-androidqf"): [
-        "--iocs", "--output", "--hashes", "--module", "--list-modules",
-        "--virustotal", "--delay", "--non-interactive",
+        "--iocs",
+        "--output",
+        "--hashes",
+        "--module",
+        "--list-modules",
+        "--virustotal",
+        "--delay",
+        "--non-interactive",
     ],
-    ("mvt-android", "check-backup"): ["--iocs", "--output", "--list-modules", "--non-interactive"],
-    ("mvt-android", "check-bugreport"): ["--iocs", "--output", "--module", "--list-modules", "--timezone"],
-    ("mvt-android", "check-intrusion-logs"): ["--iocs", "--output", "--module", "--list-modules", "--timezone"],
+    ("mvt-android", "check-backup"): [
+        "--iocs",
+        "--output",
+        "--list-modules",
+        "--non-interactive",
+    ],
+    ("mvt-android", "check-bugreport"): [
+        "--iocs",
+        "--output",
+        "--module",
+        "--list-modules",
+        "--timezone",
+    ],
+    ("mvt-android", "check-intrusion-logs"): [
+        "--iocs",
+        "--output",
+        "--module",
+        "--list-modules",
+        "--timezone",
+    ],
     ("mvt-android", "check-iocs"): ["--iocs", "--module", "--list-modules"],
     ("mvt", "download-iocs"): [],
 }
@@ -59,7 +111,14 @@ ALERT_KEYS = {"level", "module", "message", "event_time", "event", "matched_indi
 ALERT_LEVELS = {"INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"}
 
 # Log prefixes LogLevel.classify() in LogLine.swift looks for.
-LOG_PREFIXES = ["INFO ALERT", "LOW ALERT", "MEDIUM ALERT", "HIGH ALERT", "CRITICAL ALERT", "WARNING"]
+LOG_PREFIXES = [
+    "INFO ALERT",
+    "LOW ALERT",
+    "MEDIUM ALERT",
+    "HIGH ALERT",
+    "CRITICAL ALERT",
+    "WARNING",
+]
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -69,14 +128,21 @@ def run(args, **kwargs):
     env = dict(os.environ, COLUMNS="200", NO_COLOR="1", TERM="dumb")
     env.setdefault("MVT_DATA_FOLDER", tempfile.mkdtemp(prefix="mvt-data-"))
     return subprocess.run(
-        args, capture_output=True, text=True, stdin=subprocess.DEVNULL, env=env, **kwargs
+        args,
+        capture_output=True,
+        text=True,
+        stdin=subprocess.DEVNULL,
+        env=env,
+        **kwargs,
     )
 
 
 def help_text(*args) -> str:
     result = run([*args, "--help"])
     if result.returncode != 0:
-        errors.append(f"`{' '.join(args)} --help` failed: {result.stderr.strip()[:300]}")
+        errors.append(
+            f"`{' '.join(args)} --help` failed: {result.stderr.strip()[:300]}"
+        )
     return result.stdout
 
 
@@ -97,7 +163,9 @@ def check_options():
         for cmd in sorted(expected - available):
             errors.append(f"{tool}: command `{cmd}` is gone")
         for cmd in sorted(available - expected - NOT_IN_GUI):
-            warnings.append(f"{tool}: new command `{cmd}` is not exposed in the GUI yet")
+            warnings.append(
+                f"{tool}: new command `{cmd}` is not exposed in the GUI yet"
+            )
 
     for (tool, cmd), options in EXPECTED_OPTIONS.items():
         text = help_text(tool, cmd)
@@ -118,7 +186,14 @@ def check_environment_variables():
 
 
 def check_version_output():
-    result = run(["mvt-ios", "--disable-update-check", "--disable-indicator-update-check", "version"])
+    result = run(
+        [
+            "mvt-ios",
+            "--disable-update-check",
+            "--disable-indicator-update-check",
+            "version",
+        ]
+    )
     if not re.search(r"^\s*Version:\s*\S+", result.stdout, re.MULTILINE):
         errors.append("`mvt-ios version` no longer prints a `Version: X` line")
 
@@ -127,16 +202,27 @@ def check_results_format():
     """Run a real check against the test backup and inspect its output."""
     backup = REPO_ROOT / "tests/artifacts/ios_backup"
     if not backup.is_dir():
-        warnings.append("tests/artifacts/ios_backup missing; skipped the output format check")
+        warnings.append(
+            "tests/artifacts/ios_backup missing; skipped the output format check"
+        )
         return
 
     with tempfile.TemporaryDirectory() as out:
-        result = run([
-            "mvt-ios", "--disable-update-check", "--disable-indicator-update-check",
-            "check-backup", "--output", out, str(backup),
-        ])
+        result = run(
+            [
+                "mvt-ios",
+                "--disable-update-check",
+                "--disable-indicator-update-check",
+                "check-backup",
+                "--output",
+                out,
+                str(backup),
+            ]
+        )
         if result.returncode != 0:
-            errors.append(f"check-backup on the test backup failed:\n{result.stdout[-1500:]}{result.stderr[-1500:]}")
+            errors.append(
+                f"check-backup on the test backup failed:\n{result.stdout[-1500:]}{result.stderr[-1500:]}"
+            )
             return
 
         output = result.stdout + result.stderr
@@ -155,14 +241,18 @@ def check_results_format():
         if os.path.exists(alerts_path):
             alerts = json.load(open(alerts_path))
             if not isinstance(alerts, list) or not alerts:
-                errors.append("alerts.json is no longer a non-empty list for the test backup")
+                errors.append(
+                    "alerts.json is no longer a non-empty list for the test backup"
+                )
             for alert in alerts[:20]:
                 missing = ALERT_KEYS - set(alert)
                 if missing:
                     errors.append(f"alerts.json entries lack {sorted(missing)}")
                     break
                 if alert["level"] not in ALERT_LEVELS:
-                    errors.append(f"unknown alert level {alert['level']!r} in alerts.json")
+                    errors.append(
+                        f"unknown alert level {alert['level']!r} in alerts.json"
+                    )
                     break
 
         info_path = os.path.join(out, "info.json")
@@ -194,16 +284,22 @@ print(json.dumps({"index": index, "name": os.path.basename(path or "")}))
     try:
         data = json.loads(result.stdout.strip().splitlines()[-1])
     except (IndexError, ValueError):
-        errors.append(f"could not inspect indicator downloads: {result.stderr.strip()[-300:]}")
+        errors.append(
+            f"could not inspect indicator downloads: {result.stderr.strip()[-300:]}"
+        )
         return
     if data["index"] != ["mvt-project", "mvt-indicators", "main", "indicators.yaml"]:
-        errors.append(f"the indicators index moved to {data['index']}; update IndicatorsIndex.indexURL")
+        errors.append(
+            f"the indicators index moved to {data['index']}; update IndicatorsIndex.indexURL"
+        )
     if data["name"] != "raw.githubusercontent.com_o_r_main_dir_x.stix2":
-        errors.append(f"downloaded indicators are now named like {data['name']!r}; update IndicatorSet.localFileName")
+        errors.append(
+            f"downloaded indicators are now named like {data['name']!r}; update IndicatorSet.localFileName"
+        )
 
 
 def check_indicator_isolation():
-    """"Only the ones I pick" points MVT_DATA_FOLDER at an empty folder so
+    """ "Only the ones I pick" points MVT_DATA_FOLDER at an empty folder so
     downloaded indicators aren't loaded automatically (AppState.run)."""
     backup = REPO_ROOT / "tests/artifacts/ios_backup"
     stix2 = REPO_ROOT / "tests/artifacts/stix2/cytrox.stix2"
@@ -213,22 +309,43 @@ def check_indicator_isolation():
 
     def loaded(data_folder: str) -> int:
         env_run = subprocess.run(
-            ["mvt-ios", "--disable-update-check", "--disable-indicator-update-check",
-             "check-backup", "--module", "BackupInfo", str(backup)],
-            capture_output=True, text=True, stdin=subprocess.DEVNULL,
-            env=dict(os.environ, MVT_DATA_FOLDER=data_folder, COLUMNS="200", NO_COLOR="1"),
+            [
+                "mvt-ios",
+                "--disable-update-check",
+                "--disable-indicator-update-check",
+                "check-backup",
+                "--module",
+                "BackupInfo",
+                str(backup),
+            ],
+            capture_output=True,
+            text=True,
+            stdin=subprocess.DEVNULL,
+            env=dict(
+                os.environ, MVT_DATA_FOLDER=data_folder, COLUMNS="200", NO_COLOR="1"
+            ),
         )
-        match = re.search(r"Loaded a total of (\d+) unique indicators", env_run.stdout + env_run.stderr)
+        match = re.search(
+            r"Loaded a total of (\d+) unique indicators",
+            env_run.stdout + env_run.stderr,
+        )
         return int(match.group(1)) if match else -1
 
-    with tempfile.TemporaryDirectory() as with_iocs, tempfile.TemporaryDirectory() as empty:
+    with (
+        tempfile.TemporaryDirectory() as with_iocs,
+        tempfile.TemporaryDirectory() as empty,
+    ):
         os.makedirs(os.path.join(with_iocs, "indicators"))
         shutil.copy(stix2, os.path.join(with_iocs, "indicators", "test.stix2"))
         auto, isolated = loaded(with_iocs), loaded(empty)
     if auto <= 0:
-        errors.append("MVT no longer loads .stix2 files from MVT_DATA_FOLDER/indicators automatically")
+        errors.append(
+            "MVT no longer loads .stix2 files from MVT_DATA_FOLDER/indicators automatically"
+        )
     if isolated != 0:
-        errors.append("an empty MVT_DATA_FOLDER no longer stops downloaded indicators from loading")
+        errors.append(
+            "an empty MVT_DATA_FOLDER no longer stops downloaded indicators from loading"
+        )
 
 
 def check_indicator_sources():
@@ -236,14 +353,20 @@ def check_indicator_sources():
     repositories that MVT's index doesn't; the app falls back to it when it
     can't list the repositories itself. Warn when it goes stale."""
     swift = (REPO_ROOT / "macos/MVTGUI/Services/IndicatorsIndex.swift").read_text()
-    repos = re.findall(r'SourceRepository\(owner: "([^"]+)", repo: "([^"]+)", branch: "([^"]+)"', swift)
+    repos = re.findall(
+        r'SourceRepository\(owner: "([^"]+)", repo: "([^"]+)", branch: "([^"]+)"', swift
+    )
     known = set(re.findall(r'\(repo: "([^"]+)", path: "([^"]+)"\)', swift))
     try:
         import yaml
         import requests
-        index = yaml.safe_load(requests.get(
-            "https://raw.githubusercontent.com/mvt-project/mvt-indicators/main/indicators.yaml", timeout=30
-        ).text)
+
+        index = yaml.safe_load(
+            requests.get(
+                "https://raw.githubusercontent.com/mvt-project/mvt-indicators/main/indicators.yaml",
+                timeout=30,
+            ).text
+        )
     except Exception as exc:  # network trouble shouldn't fail the build
         warnings.append(f"couldn't read MVT's indicator index: {exc}")
         return
@@ -254,22 +377,47 @@ def check_indicator_sources():
     for owner, repo, branch in repos:
         with tempfile.TemporaryDirectory() as tmp:
             clone = subprocess.run(
-                ["git", "clone", "-q", "--depth", "1", "--filter=blob:none", "--no-checkout",
-                 "--branch", branch, f"https://github.com/{owner}/{repo}", tmp],
-                capture_output=True, text=True,
+                [
+                    "git",
+                    "clone",
+                    "-q",
+                    "--depth",
+                    "1",
+                    "--filter=blob:none",
+                    "--no-checkout",
+                    "--branch",
+                    branch,
+                    f"https://github.com/{owner}/{repo}",
+                    tmp,
+                ],
+                capture_output=True,
+                text=True,
             )
             if clone.returncode != 0:
-                warnings.append(f"couldn't list {owner}/{repo}: {clone.stderr.strip()[:200]}")
+                warnings.append(
+                    f"couldn't list {owner}/{repo}: {clone.stderr.strip()[:200]}"
+                )
                 continue
-            files = subprocess.run(["git", "-C", tmp, "ls-tree", "-r", "--name-only", "HEAD"],
-                                   capture_output=True, text=True).stdout.split()
+            files = subprocess.run(
+                ["git", "-C", tmp, "ls-tree", "-r", "--name-only", "HEAD"],
+                capture_output=True,
+                text=True,
+            ).stdout.split()
         for path in files:
             key = (f"{owner}/{repo}", path)
-            if path.lower().endswith(".stix2") and key not in indexed and key not in known:
-                warnings.append(f"{owner}/{repo}: {path} isn't in MVT's index; add it to IndicatorsIndex.knownExtraFiles")
+            if (
+                path.lower().endswith(".stix2")
+                and key not in indexed
+                and key not in known
+            ):
+                warnings.append(
+                    f"{owner}/{repo}: {path} isn't in MVT's index; add it to IndicatorsIndex.knownExtraFiles"
+                )
     for key in known:
         if key in indexed:
-            warnings.append(f"{key[0]}: {key[1]} is now in MVT's index; remove it from IndicatorsIndex.knownExtraFiles")
+            warnings.append(
+                f"{key[0]}: {key[1]} is now in MVT's index; remove it from IndicatorsIndex.knownExtraFiles"
+            )
 
 
 def main() -> int:

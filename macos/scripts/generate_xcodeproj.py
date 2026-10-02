@@ -15,14 +15,20 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "MVTGUI"
 PBXPROJ = ROOT / "MVTGUI.xcodeproj" / "project.pbxproj"
 
-parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-parser.add_argument("--version", help="new MARKETING_VERSION, e.g. 4.0.1 (bumps the build number too)")
+parser = argparse.ArgumentParser(
+    description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+)
+parser.add_argument(
+    "--version", help="new MARKETING_VERSION, e.g. 4.0.1 (bumps the build number too)"
+)
 parser.add_argument("--build", type=int, help="new CURRENT_PROJECT_VERSION")
 args = parser.parse_args()
 
 current = PBXPROJ.read_text() if PBXPROJ.exists() else ""
 version = args.version or re.search(r"MARKETING_VERSION = ([^;]+);", current).group(1)
-build = args.build or int(re.search(r"CURRENT_PROJECT_VERSION = (\d+);", current).group(1)) + (1 if args.version else 0)
+build = args.build or int(
+    re.search(r"CURRENT_PROJECT_VERSION = (\d+);", current).group(1)
+) + (1 if args.version else 0)
 
 
 def oid(name):
@@ -36,9 +42,26 @@ for folder in sorted(p for p in APP.iterdir() if p.is_dir() and not p.suffix):
     if swift:
         groups[folder.name] = swift
 
-P = {k: oid(k) for k in ["project", "rootGroup", "appGroup", "productsGroup", "product", "target",
-                         "sources", "frameworks", "resources", "projCfgList", "tgtCfgList",
-                         "projDebug", "projRelease", "tgtDebug", "tgtRelease"]}
+P = {
+    k: oid(k)
+    for k in [
+        "project",
+        "rootGroup",
+        "appGroup",
+        "productsGroup",
+        "product",
+        "target",
+        "sources",
+        "frameworks",
+        "resources",
+        "projCfgList",
+        "tgtCfgList",
+        "projDebug",
+        "projRelease",
+        "tgtDebug",
+        "tgtRelease",
+    ]
+}
 for g in groups:
     if g:
         P["group:" + g] = oid("group:" + g)
@@ -57,56 +80,64 @@ for g, files in groups.items():
             ftype = "folder.assetcatalog"
             res_phase.append((bf, f))
             phase = "Resources"
-        file_refs.append(f'\t\t{ref} /* {f} */ = {{isa = PBXFileReference; lastKnownFileType = {ftype}; path = {f}; sourceTree = "<group>"; }};')
-        build_files.append(f'\t\t{bf} /* {f} in {phase} */ = {{isa = PBXBuildFile; fileRef = {ref} /* {f} */; }};')
+        file_refs.append(
+            f'\t\t{ref} /* {f} */ = {{isa = PBXFileReference; lastKnownFileType = {ftype}; path = {f}; sourceTree = "<group>"; }};'
+        )
+        build_files.append(
+            f"\t\t{bf} /* {f} in {phase} */ = {{isa = PBXBuildFile; fileRef = {ref} /* {f} */; }};"
+        )
         group_children[g].append((ref, f))
 
-file_refs.append(f'\t\t{P["product"]} /* MVTGUI.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MVTGUI.app; sourceTree = BUILT_PRODUCTS_DIR; }};')
+file_refs.append(
+    f"\t\t{P['product']} /* MVTGUI.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MVTGUI.app; sourceTree = BUILT_PRODUCTS_DIR; }};"
+)
+
 
 def children(items):
     return "\n".join(f"\t\t\t\t{i} /* {n} */," for i, n in items)
 
+
 sub = [(P["group:" + g], g) for g in groups if g]
 app_children = sub + group_children[""]
 group_sections = [
-    f'''\t\t{P["rootGroup"]} = {{
+    f"""\t\t{P["rootGroup"]} = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{P["appGroup"]} /* MVTGUI */,
 \t\t\t\t{P["productsGroup"]} /* Products */,
 \t\t\t);
 \t\t\tsourceTree = "<group>";
-\t\t}};''',
-    f'''\t\t{P["productsGroup"]} /* Products */ = {{
+\t\t}};""",
+    f"""\t\t{P["productsGroup"]} /* Products */ = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{P["product"]} /* MVTGUI.app */,
 \t\t\t);
 \t\t\tname = Products;
 \t\t\tsourceTree = "<group>";
-\t\t}};''',
-    f'''\t\t{P["appGroup"]} /* MVTGUI */ = {{
+\t\t}};""",
+    f"""\t\t{P["appGroup"]} /* MVTGUI */ = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 {children(app_children)}
 \t\t\t);
 \t\t\tpath = MVTGUI;
 \t\t\tsourceTree = "<group>";
-\t\t}};''',
+\t\t}};""",
 ]
 for g in groups:
     if not g:
         continue
-    group_sections.append(f'''\t\t{P["group:" + g]} /* {g} */ = {{
+    group_sections.append(f"""\t\t{P["group:" + g]} /* {g} */ = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 {children(group_children[g])}
 \t\t\t);
 \t\t\tpath = {g};
 \t\t\tsourceTree = "<group>";
-\t\t}};''')
+\t\t}};""")
 
-common_proj = '''\t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
+common_proj = """\t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
 \t\t\t\tCLANG_ENABLE_MODULES = YES;
 \t\t\t\tCLANG_ENABLE_OBJC_ARC = YES;
 \t\t\t\tCOPY_PHASE_STRIP = NO;
@@ -116,8 +147,10 @@ common_proj = '''\t\t\t\tALWAYS_SEARCH_USER_PATHS = NO;
 \t\t\t\tLOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 \t\t\t\tMACOSX_DEPLOYMENT_TARGET = 13.0;
 \t\t\t\tSDKROOT = macosx;
-\t\t\t\tSWIFT_VERSION = 5.0;'''
-proj_debug = common_proj + '''
+\t\t\t\tSWIFT_VERSION = 5.0;"""
+proj_debug = (
+    common_proj
+    + """
 \t\t\t\tDEBUG_INFORMATION_FORMAT = dwarf;
 \t\t\t\tENABLE_TESTABILITY = YES;
 \t\t\t\tGCC_OPTIMIZATION_LEVEL = 0;
@@ -127,12 +160,16 @@ proj_debug = common_proj + '''
 \t\t\t\t);
 \t\t\t\tONLY_ACTIVE_ARCH = YES;
 \t\t\t\tSWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-Onone";'''
-proj_release = common_proj + '''
+\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = "-Onone";"""
+)
+proj_release = (
+    common_proj
+    + """
 \t\t\t\tDEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 \t\t\t\tENABLE_NS_ASSERTIONS = NO;
-\t\t\t\tSWIFT_COMPILATION_MODE = wholemodule;'''
-tgt = '''\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+\t\t\t\tSWIFT_COMPILATION_MODE = wholemodule;"""
+)
+tgt = """\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\tASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 \t\t\t\tCODE_SIGN_IDENTITY = "-";
 \t\t\t\tCODE_SIGN_STYLE = Automatic;
@@ -152,21 +189,26 @@ tgt = '''\t\t\t\tASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 \t\t\t\tMARKETING_VERSION = {version};
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = io.github.mvtgui.MVTGUI;
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";
-\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;'''.replace("{build}", str(build)).replace("{version}", version)
+\t\t\t\tSWIFT_EMIT_LOC_STRINGS = YES;""".replace("{build}", str(build)).replace(
+    "{version}", version
+)
+
 
 def cfg(id_, name, body):
-    return f'''\t\t{id_} /* {name} */ = {{
+    return f"""\t\t{id_} /* {name} */ = {{
 \t\t\tisa = XCBuildConfiguration;
 \t\t\tbuildSettings = {{
 {body}
 \t\t\t}};
 \t\t\tname = {name};
-\t\t}};'''
+\t\t}};"""
+
 
 def phase_files(items, phase):
     return "\n".join(f"\t\t\t\t{b} /* {n} in {phase} */," for b, n in items)
 
-out = f'''// !$*UTF8*$!
+
+out = f"""// !$*UTF8*$!
 {{
 \tarchiveVersion = 1;
 \tclasses = {{
@@ -299,17 +341,19 @@ out = f'''// !$*UTF8*$!
 \t}};
 \trootObject = {P["project"]} /* Project object */;
 }}
-'''
+"""
 PBXPROJ.write_text(out)
 
-open(ROOT / "MVTGUI.xcodeproj" / "project.xcworkspace/contents.xcworkspacedata", "w").write('''<?xml version="1.0" encoding="UTF-8"?>
+open(
+    ROOT / "MVTGUI.xcodeproj" / "project.xcworkspace/contents.xcworkspacedata", "w"
+).write("""<?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
    <FileRef
       location = "self:">
    </FileRef>
 </Workspace>
-''')
+""")
 
 bref = f'''<BuildableReference
                BuildableIdentifier = "primary"
@@ -318,7 +362,9 @@ bref = f'''<BuildableReference
                BlueprintName = "MVTGUI"
                ReferencedContainer = "container:MVTGUI.xcodeproj">
             </BuildableReference>'''
-open(ROOT / "MVTGUI.xcodeproj" / "xcshareddata/xcschemes/MVTGUI.xcscheme", "w").write(f'''<?xml version="1.0" encoding="UTF-8"?>
+open(
+    ROOT / "MVTGUI.xcodeproj" / "xcshareddata/xcschemes/MVTGUI.xcscheme", "w"
+).write(f"""<?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1500"
    version = "1.7">
@@ -377,5 +423,5 @@ open(ROOT / "MVTGUI.xcodeproj" / "xcshareddata/xcschemes/MVTGUI.xcscheme", "w").
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
-''')
+""")
 print(f"MVTGUI.xcodeproj: {len(src_phase)} Swift files, version {version} ({build})")

@@ -70,15 +70,18 @@ class Command:
 
     @property
     def run_title(self) -> str:
-        return {"iosDecryptBackup": "Decrypt", "iosExtractKey": "Extract Key"}.get(self.id, "Run Check")
+        return {"iosDecryptBackup": "Decrypt", "iosExtractKey": "Extract Key"}.get(
+            self.id, "Run Check"
+        )
 
 
-O = Option
-_CHECK = frozenset({O.IOCS, O.OUTPUT, O.FAST, O.HASHES, O.MODULE, O.LIST_MODULES})
-_RECHECK_SUMMARY = (
-    "Compare JSON results from a previous run against indicators, without re-reading the original acquisition."
+Opt = Option
+_CHECK = frozenset(
+    {Opt.IOCS, Opt.OUTPUT, Opt.FAST, Opt.HASHES, Opt.MODULE, Opt.LIST_MODULES}
 )
+_RECHECK_SUMMARY = "Compare JSON results from a previous run against indicators, without re-reading the original acquisition."
 
+# fmt: off
 COMMANDS: dict[str, Command] = {
     c.id: c
     for c in [
@@ -98,55 +101,55 @@ COMMANDS: dict[str, Command] = {
             "Analyze an iOS sysdiagnose archive (.tar.gz) or an extracted sysdiagnose folder. "
             "Forensic checks come from installed plugin packages.",
             "Sysdiagnose", InputKind.FILE_OR_FOLDER,
-            frozenset({O.IOCS, O.OUTPUT, O.HASHES, O.MODULE, O.LIST_MODULES}), "ios/sysdiagnose/",
+            frozenset({Opt.IOCS, Opt.OUTPUT, Opt.HASHES, Opt.MODULE, Opt.LIST_MODULES}), "ios/sysdiagnose/",
         ),
         Command(
             "iosDecryptBackup", Tool.IOS, "decrypt-backup", "Decrypt Backup", "unlock",
             "Decrypt an encrypted iPhone backup into a new folder, using the backup password or a key file.",
             "Backup folder", InputKind.FOLDER,
-            frozenset({O.DESTINATION, O.JOBS, O.IOS_PASSWORD, O.HASHES}), "ios/backup/check/",
+            frozenset({Opt.DESTINATION, Opt.JOBS, Opt.IOS_PASSWORD, Opt.HASHES}), "ios/backup/check/",
         ),
         Command(
             "iosExtractKey", Tool.IOS, "extract-key", "Extract Backup Key", "key",
             "Derive the decryption key from an encrypted backup and its password, so you can decrypt later "
             "without the password. The key is sensitive — keep it safe.",
-            "Backup folder", InputKind.FOLDER, frozenset({O.IOS_PASSWORD, O.KEY_FILE_OUTPUT}), "ios/backup/check/",
+            "Backup folder", InputKind.FOLDER, frozenset({Opt.IOS_PASSWORD, Opt.KEY_FILE_OUTPUT}), "ios/backup/check/",
         ),
         Command(
             "iosCheckIOCs", Tool.IOS, "check-iocs", "Re-check Results", "sync", _RECHECK_SUMMARY,
-            "Results folder", InputKind.FOLDER, frozenset({O.IOCS, O.MODULE, O.LIST_MODULES}), "iocs/",
+            "Results folder", InputKind.FOLDER, frozenset({Opt.IOCS, Opt.MODULE, Opt.LIST_MODULES}), "iocs/",
         ),
         Command(
             "androidCheckAndroidQF", Tool.ANDROID, "check-androidqf", "Check AndroidQF", "package",
             "Analyze an acquisition collected with AndroidQF (folder or .zip). Includes the nested backup, "
             "bug report and intrusion logs when present.",
             "AndroidQF output", InputKind.FILE_OR_FOLDER,
-            frozenset({O.IOCS, O.OUTPUT, O.HASHES, O.MODULE, O.LIST_MODULES,
-                       O.VIRUSTOTAL, O.ANDROID_PASSWORD, O.NON_INTERACTIVE}),
+            frozenset({Opt.IOCS, Opt.OUTPUT, Opt.HASHES, Opt.MODULE, Opt.LIST_MODULES,
+                       Opt.VIRUSTOTAL, Opt.ANDROID_PASSWORD, Opt.NON_INTERACTIVE}),
             "android/methodology/",
         ),
         Command(
             "androidCheckBackup", Tool.ANDROID, "check-backup", "Check Backup (SMS)", "backup",
             "Check an Android backup (.ab file or unpacked folder). Currently extracts SMS/MMS messages.",
             "Backup", InputKind.FILE_OR_FOLDER,
-            frozenset({O.IOCS, O.OUTPUT, O.LIST_MODULES, O.ANDROID_PASSWORD, O.NON_INTERACTIVE}),
+            frozenset({Opt.IOCS, Opt.OUTPUT, Opt.LIST_MODULES, Opt.ANDROID_PASSWORD, Opt.NON_INTERACTIVE}),
             "android/backup/",
         ),
         Command(
             "androidCheckBugreport", Tool.ANDROID, "check-bugreport", "Check Bug Report", "bug",
             "Analyze a standalone Android bug report (.zip).",
             "Bug report", InputKind.FILE,
-            frozenset({O.IOCS, O.OUTPUT, O.MODULE, O.LIST_MODULES, O.TIMEZONE}), "android/adb/",
+            frozenset({Opt.IOCS, Opt.OUTPUT, Opt.MODULE, Opt.LIST_MODULES, Opt.TIMEZONE}), "android/adb/",
         ),
         Command(
             "androidCheckIntrusionLogs", Tool.ANDROID, "check-intrusion-logs", "Check Intrusion Logs", "shield",
             "Analyze Android Advanced Protection intrusion logs (folder of .txt files or a .zip).",
             "Intrusion logs", InputKind.FILE_OR_FOLDER,
-            frozenset({O.IOCS, O.OUTPUT, O.MODULE, O.LIST_MODULES, O.TIMEZONE}), "android/intrusion_logs/",
+            frozenset({Opt.IOCS, Opt.OUTPUT, Opt.MODULE, Opt.LIST_MODULES, Opt.TIMEZONE}), "android/intrusion_logs/",
         ),
         Command(
             "androidCheckIOCs", Tool.ANDROID, "check-iocs", "Re-check Results", "sync", _RECHECK_SUMMARY,
-            "Results folder", InputKind.FOLDER, frozenset({O.IOCS, O.MODULE, O.LIST_MODULES}), "iocs/",
+            "Results folder", InputKind.FOLDER, frozenset({Opt.IOCS, Opt.MODULE, Opt.LIST_MODULES}), "iocs/",
         ),
         Command(
             "downloadIOCs", Tool.COMMON, "download-iocs", "Download Indicators", "download",
@@ -156,11 +159,22 @@ COMMANDS: dict[str, Command] = {
         ),
     ]
 }
+# fmt: on
 
-IOS_COMMANDS = ["iosCheckBackup", "iosCheckFS", "iosCheckSysdiagnose", "iosDecryptBackup", "iosExtractKey", "iosCheckIOCs"]
+IOS_COMMANDS = [
+    "iosCheckBackup",
+    "iosCheckFS",
+    "iosCheckSysdiagnose",
+    "iosDecryptBackup",
+    "iosExtractKey",
+    "iosCheckIOCs",
+]
 ANDROID_COMMANDS = [
-    "androidCheckAndroidQF", "androidCheckBackup", "androidCheckBugreport",
-    "androidCheckIntrusionLogs", "androidCheckIOCs",
+    "androidCheckAndroidQF",
+    "androidCheckBackup",
+    "androidCheckBugreport",
+    "androidCheckIntrusionLogs",
+    "androidCheckIOCs",
 ]
 
 
@@ -217,7 +231,9 @@ class CommandForm:
     @property
     def indicator_files(self) -> list[str]:
         """The files passed with --iocs."""
-        picked = sorted(self.picked_indicators) if self.indicator_mode == "picked" else []
+        picked = (
+            sorted(self.picked_indicators) if self.indicator_mode == "picked" else []
+        )
         return picked + [f for f in self.ioc_files if f not in picked]
 
     def validation_error(self) -> str | None:
@@ -228,20 +244,22 @@ class CommandForm:
                 return f"Choose the {label} to analyze."
             if not os.path.exists(self.input_path):
                 return f"The selected {label} no longer exists."
-        if self.has(O.DESTINATION) and not self.destination_path:
+        if self.has(Opt.DESTINATION) and not self.destination_path:
             return "Choose a destination folder for the decrypted backup."
-        if self.has(O.IOS_PASSWORD):
+        if self.has(Opt.IOS_PASSWORD):
             if self.use_key_file and self.command.id == "iosDecryptBackup":
                 if not self.key_file_path:
                     return "Choose the key file."
             elif not self.password:
                 return "Enter the backup password."
         if (
-            self.has(O.VIRUSTOTAL) and self.virustotal and not self.virustotal_api_key
+            self.has(Opt.VIRUSTOTAL)
+            and self.virustotal
+            and not self.virustotal_api_key
             and not os.environ.get("MVT_VT_API_KEY")
         ):
             return "Enter a VirusTotal API key, or turn VirusTotal lookups off."
-        if self.has(O.IOCS):
+        if self.has(Opt.IOCS):
             for ioc in self.indicator_files:
                 if not os.path.isfile(ioc):
                     return f"Indicator file not found: {ioc}"
@@ -260,42 +278,45 @@ class CommandForm:
                 args.append(self.input_path if exists else tempfile.gettempdir())
             return Invocation(self.command.tool, args, env)
 
-        if self.has(O.IOCS):
+        if self.has(Opt.IOCS):
             for ioc in self.indicator_files:
                 args += ["--iocs", ioc]
-        if self.has(O.OUTPUT) and self.output_path:
+        if self.has(Opt.OUTPUT) and self.output_path:
             args += ["--output", self.output_path]
-        if self.has(O.FAST) and self.fast:
+        if self.has(Opt.FAST) and self.fast:
             args.append("--fast")
-        if self.has(O.HASHES) and self.hashes:
+        if self.has(Opt.HASHES) and self.hashes:
             args.append("--hashes")
-        if self.has(O.MODULE) and self.module.strip():
+        if self.has(Opt.MODULE) and self.module.strip():
             args += ["--module", self.module.strip()]
-        if self.has(O.TIMEZONE) and self.timezone.strip():
+        if self.has(Opt.TIMEZONE) and self.timezone.strip():
             args += ["--timezone", self.timezone.strip()]
-        if self.has(O.DESTINATION):
+        if self.has(Opt.DESTINATION):
             args += ["--destination", self.destination_path, "--jobs", str(self.jobs)]
-        if self.has(O.IOS_PASSWORD):
+        if self.has(Opt.IOS_PASSWORD):
             if self.use_key_file and self.command.id == "iosDecryptBackup":
                 args += ["--key-file", self.key_file_path]
             else:
                 env["MVT_IOS_BACKUP_PASSWORD"] = self.password
-        if self.has(O.KEY_FILE_OUTPUT) and self.key_file_output_path:
+        if self.has(Opt.KEY_FILE_OUTPUT) and self.key_file_output_path:
             args += ["--key-file", self.key_file_output_path]
-        if self.has(O.ANDROID_PASSWORD) and self.password:
+        if self.has(Opt.ANDROID_PASSWORD) and self.password:
             env["MVT_ANDROID_BACKUP_PASSWORD"] = self.password
-        if self.has(O.VIRUSTOTAL) and self.virustotal:
+        if self.has(Opt.VIRUSTOTAL) and self.virustotal:
             args += ["--virustotal", "--delay", str(self.virustotal_delay)]
             if self.virustotal_api_key:
                 env["MVT_VT_API_KEY"] = self.virustotal_api_key
         # The app has no terminal to answer prompts on.
-        if self.has(O.NON_INTERACTIVE):
+        if self.has(Opt.NON_INTERACTIVE):
             args.append("--non-interactive")
 
         if self.command.input_kind is not InputKind.NONE:
             args.append(self.input_path)
 
         return Invocation(
-            self.command.tool, args, env,
-            only_passed_indicators=self.has(O.IOCS) and self.indicator_mode == "picked",
+            self.command.tool,
+            args,
+            env,
+            only_passed_indicators=self.has(Opt.IOCS)
+            and self.indicator_mode == "picked",
         )

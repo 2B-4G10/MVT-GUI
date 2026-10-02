@@ -154,11 +154,19 @@ class MainWindow(QMainWindow):
 
         context.navigate.connect(self.show_page)
         context.mvt_changed.connect(self._update_status)
-        context.error.connect(lambda message: QMessageBox.warning(self, "Something went wrong", message))
-        QGuiApplication.styleHints().colorSchemeChanged.connect(lambda _: self._restyle())
+        context.error.connect(
+            lambda message: QMessageBox.warning(self, "Something went wrong", message)
+        )
+        QGuiApplication.styleHints().colorSchemeChanged.connect(
+            lambda _: self._restyle()
+        )
         self._update_status()
         self._restyle()
-        self.show_page(start if start in ("setup", "indicators", "results") or start in COMMANDS else "setup")
+        self.show_page(
+            start
+            if start in ("setup", "indicators", "results") or start in COMMANDS
+            else "setup"
+        )
 
     def _item(self, key: str, title: str, glyph: str, color: str | None = None) -> None:
         item = QListWidgetItem(icon(glyph, color), title)
@@ -219,9 +227,13 @@ class MainWindow(QMainWindow):
     def _update_status(self) -> None:
         c = self.context
         if c.installed_version and c.is_outdated:
-            self.status.setText(f"<span style='color:#C25E00'>●</span> MVT {c.installed_version} · update available")
+            self.status.setText(
+                f"<span style='color:#C25E00'>●</span> MVT {c.installed_version} · update available"
+            )
         elif c.installed_version:
-            self.status.setText(f"<span style='color:{pick(SUCCESS).name()}'>●</span> MVT {c.installed_version}")
+            self.status.setText(
+                f"<span style='color:{pick(SUCCESS).name()}'>●</span> MVT {c.installed_version}"
+            )
         else:
             self.status.setText("<span style='color:#C25E00'>●</span> MVT not found")
         self.status.setToolTip(f"{environment.APP_NAME} {__version__}")
@@ -245,7 +257,9 @@ class MainWindow(QMainWindow):
 
 
 def apply_appearance(appearance: str) -> None:
-    scheme = {"light": Qt.ColorScheme.Light, "dark": Qt.ColorScheme.Dark}.get(appearance, Qt.ColorScheme.Unknown)
+    scheme = {"light": Qt.ColorScheme.Light, "dark": Qt.ColorScheme.Dark}.get(
+        appearance, Qt.ColorScheme.Unknown
+    )
     QGuiApplication.styleHints().setColorScheme(scheme)
 
 
@@ -256,7 +270,9 @@ def set_app_user_model_id() -> None:
         import ctypes
 
         try:
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_USER_MODEL_ID)
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+                APP_USER_MODEL_ID
+            )
         except (AttributeError, OSError):
             pass
 
@@ -308,12 +324,15 @@ def main(argv: list[str] | None = None) -> int:
     window.show()
 
     if args.screenshot:
+
         def capture():
             window.grab().save(args.screenshot)
             app.quit()
 
         # Long enough for the indicator list and the update check to load.
-        QTimer.singleShot(int(float(os.environ.get("MVTWIN_SCREENSHOT_DELAY", "8")) * 1000), capture)
+        QTimer.singleShot(
+            int(float(os.environ.get("MVTWIN_SCREENSHOT_DELAY", "8")) * 1000), capture
+        )
     elif context.installed_version is None:
         QTimer.singleShot(0, lambda: window.show_page("setup"))
     return app.exec()

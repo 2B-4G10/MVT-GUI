@@ -44,20 +44,38 @@ LAUNCHER = f"{APP_NAME}.exe"
 
 # The newest Python that every locked MVT dependency has Windows wheels for.
 # check_updates.py reports newer releases.
-PYTHON_VERSION = "3.14.7"
+PYTHON_VERSION = "3.14.8"
 PYSIDE_VERSION = "6.11.2"
 PIP_VERSION = "26.2.1"
 
 # Qt pieces the app uses. Everything else in PySide6-Essentials (QML, Quick,
 # Designer, tools…) is left out.
 QT_KEEP = {
-    "__init__.py", "_config.py", "_git_pyside_version.py", "py.typed",
-    "QtCore.pyd", "QtGui.pyd", "QtWidgets.pyd",
-    "Qt6Core.dll", "Qt6Gui.dll", "Qt6Widgets.dll", "pyside6.abi3.dll",
-    "concrt140.dll", "msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll", "msvcp140_codecvt_ids.dll",
-    "vcruntime140.dll", "vcruntime140_1.dll",
+    "__init__.py",
+    "_config.py",
+    "_git_pyside_version.py",
+    "py.typed",
+    "QtCore.pyd",
+    "QtGui.pyd",
+    "QtWidgets.pyd",
+    "Qt6Core.dll",
+    "Qt6Gui.dll",
+    "Qt6Widgets.dll",
+    "pyside6.abi3.dll",
+    "concrt140.dll",
+    "msvcp140.dll",
+    "msvcp140_1.dll",
+    "msvcp140_2.dll",
+    "msvcp140_codecvt_ids.dll",
+    "vcruntime140.dll",
+    "vcruntime140_1.dll",
 }
-QT_PLUGINS_KEEP = {"platforms/qwindows.dll", "styles", "imageformats/qico.dll", "imageformats/qjpeg.dll"}
+QT_PLUGINS_KEEP = {
+    "platforms/qwindows.dll",
+    "styles",
+    "imageformats/qico.dll",
+    "imageformats/qjpeg.dll",
+}
 
 # Windows' own DLLs, which the PE check doesn't expect to find in the folder.
 SYSTEM_DLL = re.compile(
@@ -88,15 +106,29 @@ def download(url: str, cache: Path) -> Path:
 
 def python_runtime(root: Path, version: str, cache: Path) -> str:
     """Unpacks the embeddable Python and arranges it; returns e.g. "314"."""
-    archive = download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-amd64.zip", cache)
+    archive = download(
+        f"https://www.python.org/ftp/python/{version}/python-{version}-embed-amd64.zip",
+        cache,
+    )
     with zipfile.ZipFile(archive) as z:
         z.extractall(root)
     short = "".join(version.split(".")[:2])
     (root / "DLLs").mkdir()
     (root / "Lib").mkdir()
-    core = {"python.exe", "pythonw.exe", f"python{short}.dll", "python3.dll", "vcruntime140.dll", "vcruntime140_1.dll"}
+    core = {
+        "python.exe",
+        "pythonw.exe",
+        f"python{short}.dll",
+        "python3.dll",
+        "vcruntime140.dll",
+        "vcruntime140_1.dll",
+    }
     for item in list(root.iterdir()):
-        if item.is_file() and item.suffix.lower() in (".pyd", ".dll") and item.name.lower() not in core:
+        if (
+            item.is_file()
+            and item.suffix.lower() in (".pyd", ".dll")
+            and item.name.lower() not in core
+        ):
             item.rename(root / "DLLs" / item.name)
     (root / f"python{short}.zip").rename(root / "Lib" / f"python{short}.zip")
     (root / "LICENSE.txt").rename(root / "Lib" / "PYTHON-LICENSE.txt")
@@ -115,10 +147,25 @@ def install_packages(root: Path, short: str, mvt: str) -> None:
     log(f"Installing {mvt}, PySide6-Essentials {PYSIDE_VERSION} and pip {PIP_VERSION}")
     subprocess.run(
         [
-            sys.executable, "-m", "pip", "install", "--quiet", "--disable-pip-version-check",
-            "--target", str(site), "--no-compile", "--only-binary=:all:",
-            "--platform", "win_amd64", "--python-version", f"{short[0]}.{short[1:]}", "--implementation", "cp",
-            mvt, f"PySide6-Essentials=={PYSIDE_VERSION}", f"pip=={PIP_VERSION}",
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--quiet",
+            "--disable-pip-version-check",
+            "--target",
+            str(site),
+            "--no-compile",
+            "--only-binary=:all:",
+            "--platform",
+            "win_amd64",
+            "--python-version",
+            f"{short[0]}.{short[1:]}",
+            "--implementation",
+            "cp",
+            mvt,
+            f"PySide6-Essentials=={PYSIDE_VERSION}",
+            f"pip=={PIP_VERSION}",
         ],
         check=True,
     )
@@ -135,14 +182,21 @@ def install_packages(root: Path, short: str, mvt: str) -> None:
     plugins = pyside / "plugins"
     for group in plugins.iterdir():
         for item in group.iterdir():
-            keep = f"{group.name}/{item.name}" in QT_PLUGINS_KEEP or group.name in QT_PLUGINS_KEEP
+            keep = (
+                f"{group.name}/{item.name}" in QT_PLUGINS_KEEP
+                or group.name in QT_PLUGINS_KEEP
+            )
             if not keep:
                 shutil.rmtree(item) if item.is_dir() else item.unlink()
         if not any(group.iterdir()):
             group.rmdir()
     for item in (site / "shiboken6").iterdir():
         # C++ AMP, OpenMP and WinRT runtimes: nothing loads them.
-        if item.suffix in (".lib", ".pyi") or item.name in ("vcamp140.dll", "vccorlib140.dll", "vcomp140.dll"):
+        if item.suffix in (".lib", ".pyi") or item.name in (
+            "vcamp140.dll",
+            "vccorlib140.dll",
+            "vcomp140.dll",
+        ):
             item.unlink()
     for pattern in ("**/*.pyi", "**/__pycache__"):
         for item in site.glob(pattern):
@@ -151,14 +205,25 @@ def install_packages(root: Path, short: str, mvt: str) -> None:
 
 def install_app(root: Path, version: str) -> None:
     app = root / "app"
-    shutil.copytree(REPO / "windows" / "mvtwin", app / "mvtwin", ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copytree(
+        REPO / "windows" / "mvtwin",
+        app / "mvtwin",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
     init = app / "mvtwin" / "__init__.py"
-    init.write_text(re.sub(r'__version__ = ".*"', f'__version__ = "{version}"', init.read_text()))
+    init.write_text(
+        re.sub(r'__version__ = ".*"', f'__version__ = "{version}"', init.read_text())
+    )
     icons = REPO / "macos" / "MVTGUI" / "Assets.xcassets" / "AppIcon.appiconset"
     (app / "mvtwin" / "resources").mkdir()
     for size in ("16x16", "32x32", "32x32@2x", "128x128", "256x256"):
-        shutil.copy(icons / f"icon_{size}.png", app / "mvtwin" / "resources" / f"icon_{size.replace('@2x', '_2x')}.png")
-    shutil.copy(REPO / "windows" / "launcher" / "sitecustomize.py", app / "sitecustomize.py")
+        shutil.copy(
+            icons / f"icon_{size}.png",
+            app / "mvtwin" / "resources" / f"icon_{size.replace('@2x', '_2x')}.png",
+        )
+    shutil.copy(
+        REPO / "windows" / "launcher" / "sitecustomize.py", app / "sitecustomize.py"
+    )
     # The app's own executable: Python's signed pythonw.exe.
     (root / "pythonw.exe").rename(root / LAUNCHER)
     shutil.copy(REPO / "LICENSE", root / "LICENSE.txt")
@@ -174,8 +239,16 @@ def compile_bytecode(root: Path) -> None:
         return
     log("Compiling .pyc files")
     subprocess.run(
-        [str(root / "python.exe"), "-m", "compileall", "-q", "-j", "0",
-         str(root / "Lib" / "site-packages"), str(root / "app")],
+        [
+            str(root / "python.exe"),
+            "-m",
+            "compileall",
+            "-q",
+            "-j",
+            "0",
+            str(root / "Lib" / "site-packages"),
+            str(root / "app"),
+        ],
         check=True,
     )
 
@@ -185,12 +258,16 @@ def check_dlls(root: Path) -> None:
     part of Windows, so the app can't fail with a missing DLL."""
     import pefile
 
-    binaries = [p for p in root.rglob("*") if p.suffix.lower() in (".exe", ".dll", ".pyd")]
+    binaries = [
+        p for p in root.rglob("*") if p.suffix.lower() in (".exe", ".dll", ".pyd")
+    ]
     present = {p.name.lower() for p in binaries}
     missing = []
     for path in binaries:
         pe = pefile.PE(str(path), fast_load=True)
-        pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_IMPORT"]])
+        pe.parse_data_directories(
+            directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_IMPORT"]]
+        )
         for entry in getattr(pe, "DIRECTORY_ENTRY_IMPORT", []):
             name = entry.dll.decode().lower()
             if name not in present and not SYSTEM_DLL.search(name):
@@ -209,7 +286,9 @@ def signatures(root: Path) -> tuple[list[str], list[str]]:
     for path in sorted(root.rglob("*")):
         if path.suffix.lower() in (".exe", ".dll", ".pyd"):
             pe = pefile.PE(str(path), fast_load=True)
-            security = pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_SECURITY"]]
+            security = pe.OPTIONAL_HEADER.DATA_DIRECTORY[
+                pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_SECURITY"]
+            ]
             (signed if security.Size else unsigned).append(str(path.relative_to(root)))
             pe.close()
     return signed, unsigned
@@ -224,17 +303,32 @@ def make_zip(root: Path, target: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--version", default=None, help="the app's version (default: windows/mvtwin/__init__.py)")
-    parser.add_argument("--python", default=PYTHON_VERSION, help=f"Python version (default {PYTHON_VERSION})")
-    parser.add_argument("--mvt", default="mvt", help='MVT to install: "mvt", "mvt==2026.9.28" or a wheel')
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--version",
+        default=None,
+        help="the app's version (default: windows/mvtwin/__init__.py)",
+    )
+    parser.add_argument(
+        "--python",
+        default=PYTHON_VERSION,
+        help=f"Python version (default {PYTHON_VERSION})",
+    )
+    parser.add_argument(
+        "--mvt",
+        default="mvt",
+        help='MVT to install: "mvt", "mvt==2026.9.28" or a wheel',
+    )
     parser.add_argument("--out", type=Path, default=REPO / "dist", help="output folder")
     parser.add_argument("--cache", type=Path, default=REPO / "build" / "windows-cache")
     parser.add_argument("--no-zip", action="store_true")
     args = parser.parse_args()
 
     version = (args.version or "").removeprefix("gui-v") or re.search(
-        r'__version__ = "(.*)"', (REPO / "windows" / "mvtwin" / "__init__.py").read_text()
+        r'__version__ = "(.*)"',
+        (REPO / "windows" / "mvtwin" / "__init__.py").read_text(),
     ).group(1)
     root = args.out / APP_NAME
     if root.exists():
@@ -247,7 +341,9 @@ def main() -> int:
     compile_bytecode(root)
     check_dlls(root)
     signed, unsigned = signatures(root)
-    log(f"{len(signed)} signed binaries; {len(unsigned)} unsigned (extension modules of PyPI packages):")
+    log(
+        f"{len(signed)} signed binaries; {len(unsigned)} unsigned (extension modules of PyPI packages):"
+    )
     for name in unsigned:
         print(f"    {name}")
     for name in ("python.exe", LAUNCHER):
@@ -259,7 +355,9 @@ def main() -> int:
     if not args.no_zip:
         zip_path = args.out / f"MVT-for-Windows-{version}.zip"
         make_zip(root, zip_path)
-        log(f"{zip_path.stat().st_size / 1e6:.0f} MB, sha256 {hashlib.sha256(zip_path.read_bytes()).hexdigest()}")
+        log(
+            f"{zip_path.stat().st_size / 1e6:.0f} MB, sha256 {hashlib.sha256(zip_path.read_bytes()).hexdigest()}"
+        )
     return 0
 
 
