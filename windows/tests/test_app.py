@@ -83,7 +83,7 @@ def test_check_backup_and_results(window, tmp_path):
 
 
 def test_only_picked_indicators(window, tmp_path):
-    """"Only the ones I pick" must not load the downloaded indicators."""
+    """ "Only the ones I pick" must not load the downloaded indicators."""
     from mvtwin import environment
 
     folder = environment.indicators_folder()
@@ -97,7 +97,10 @@ def test_only_picked_indicators(window, tmp_path):
     def loaded() -> str:
         context.runner.run_mvt(form.invocation(), "test")
         wait_for(lambda: not context.runner.is_running)
-        return next((line for line, _ in context.runner.lines if "Loaded a total of" in line), "")
+        return next(
+            (line for line, _ in context.runner.lines if "Loaded a total of" in line),
+            "",
+        )
 
     form.indicator_mode = "all"
     assert "Loaded a total of 0 " not in loaded()

@@ -19,7 +19,10 @@ def report(error: BaseException) -> None:
         import ctypes
 
         ctypes.windll.user32.MessageBoxW(
-            None, f"MVT for Windows couldn't start:\n\n{error}{where}", "MVT for Windows", 0x10
+            None,
+            f"MVT for Windows couldn't start:\n\n{error}{where}",
+            "MVT for Windows",
+            0x10,
         )
     else:
         print(details, file=sys.stderr)

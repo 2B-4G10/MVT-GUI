@@ -30,7 +30,9 @@ def _open_app() -> None:
         import traceback
 
         try:
-            with open(os.path.join(os.path.dirname(sys.executable), "launch-error.log"), "w") as log:
+            with open(
+                os.path.join(os.path.dirname(sys.executable), "launch-error.log"), "w"
+            ) as log:
                 traceback.print_exc(file=log)
         except OSError:
             pass

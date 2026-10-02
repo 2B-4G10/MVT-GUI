@@ -17,7 +17,9 @@ from pathlib import Path
 from . import environment
 
 # The index `mvt download-iocs` reads (IndicatorsUpdates in updates.py).
-INDEX_URL = "https://raw.githubusercontent.com/mvt-project/mvt-indicators/main/indicators.yaml"
+INDEX_URL = (
+    "https://raw.githubusercontent.com/mvt-project/mvt-indicators/main/indicators.yaml"
+)
 
 
 @dataclass(frozen=True)
@@ -36,7 +38,9 @@ class SourceRepository:
 # their files; any STIX2 file it doesn't list is added from here.
 SOURCE_REPOSITORIES = [
     SourceRepository("mvt-project", "mvt-indicators", "main", "MVT project"),
-    SourceRepository("AmnestyTech", "investigations", "master", "Amnesty International"),
+    SourceRepository(
+        "AmnestyTech", "investigations", "master", "Amnesty International"
+    ),
     SourceRepository("AssoEchap", "stalkerware-indicators", "master", "Echap"),
 ]
 
@@ -106,7 +110,9 @@ def parse_index(text: str) -> list[IndicatorSet]:
         if body == "indicators:":
             continue
         if body.startswith("-") and indent <= 2:
-            entries.append({"fields": {}, "github": {}, "sources": [], "references": []})
+            entries.append(
+                {"fields": {}, "github": {}, "sources": [], "references": []}
+            )
             section = None
             body = body[1:].strip()
             if not body:
@@ -134,7 +140,11 @@ def parse_index(text: str) -> list[IndicatorSet]:
     for entry in entries:
         fields, github = entry["fields"], entry["github"]
         if fields.get("type") == "github":
-            owner, repo, path = github.get("owner"), github.get("repo"), github.get("path")
+            owner, repo, path = (
+                github.get("owner"),
+                github.get("repo"),
+                github.get("path"),
+            )
             if not (owner and repo and path):
                 continue
             url = f"https://raw.githubusercontent.com/{owner}/{repo}/{github.get('branch') or 'main'}/{path}"
@@ -142,12 +152,14 @@ def parse_index(text: str) -> list[IndicatorSet]:
             url = fields.get("download_url", "")
         if not url.startswith("https://"):
             continue
-        sets.append(IndicatorSet(
-            name=fields.get("name") or url.rsplit("/", 1)[-1],
-            download_url=url,
-            sources=tuple(entry["sources"]),
-            references=tuple(entry["references"]),
-        ))
+        sets.append(
+            IndicatorSet(
+                name=fields.get("name") or url.rsplit("/", 1)[-1],
+                download_url=url,
+                sources=tuple(entry["sources"]),
+                references=tuple(entry["references"]),
+            )
+        )
     return sets
 
 
@@ -156,7 +168,7 @@ def fetch_index() -> list[IndicatorSet]:
 
 
 def display_name(path: str) -> str:
-    """"2021-12-16_cytrox/cytrox.stix2" → "Cytrox indicators (2021-12-16)"."""
+    """ "2021-12-16_cytrox/cytrox.stix2" → "Cytrox indicators (2021-12-16)"."""
     folder = os.path.dirname(path)
     words = (folder or os.path.basename(path)).replace(".stix2", "").split("_")
     date = None
@@ -169,7 +181,11 @@ def display_name(path: str) -> str:
 def _stix2_paths(source: SourceRepository) -> list[str]:
     url = f"https://api.github.com/repos/{source.owner}/{source.repo}/git/trees/{source.branch}?recursive=1"
     tree = json.loads(_get(url)).get("tree") or []
-    return [item["path"] for item in tree if str(item.get("path", "")).lower().endswith(".stix2")]
+    return [
+        item["path"]
+        for item in tree
+        if str(item.get("path", "")).lower().endswith(".stix2")
+    ]
 
 
 def extra_sets(known: list[IndicatorSet]) -> list[IndicatorSet]:
@@ -185,7 +201,9 @@ def extra_sets(known: list[IndicatorSet]) -> list[IndicatorSet]:
             listed_all = False
     if not listed_all:
         for repo, path in KNOWN_EXTRA_FILES:
-            source = next(s for s in SOURCE_REPOSITORIES if f"{s.owner}/{s.repo}" == repo)
+            source = next(
+                s for s in SOURCE_REPOSITORIES if f"{s.owner}/{s.repo}" == repo
+            )
             if (source, path) not in found:
                 found.append((source, path))
     sets = []
@@ -194,13 +212,15 @@ def extra_sets(known: list[IndicatorSet]) -> list[IndicatorSet]:
         if url in known_urls:
             continue
         folder = os.path.dirname(path)
-        sets.append(IndicatorSet(
-            name=display_name(path),
-            download_url=url,
-            sources=(source.organization,),
-            references=(f"{source.web_url}/tree/{source.branch}/{folder}",),
-            in_mvt_index=False,
-        ))
+        sets.append(
+            IndicatorSet(
+                name=display_name(path),
+                download_url=url,
+                sources=(source.organization,),
+                references=(f"{source.web_url}/tree/{source.branch}/{folder}",),
+                in_mvt_index=False,
+            )
+        )
     return sets
 
 
@@ -221,7 +241,11 @@ def downloaded_files() -> list[Path]:
     if not folder.is_dir():
         return []
     return sorted(
-        (p for p in folder.iterdir() if p.suffix.lower() == ".stix2" and not p.name.startswith(".")),
+        (
+            p
+            for p in folder.iterdir()
+            if p.suffix.lower() == ".stix2" and not p.name.startswith(".")
+        ),
         key=lambda p: p.name,
     )
 

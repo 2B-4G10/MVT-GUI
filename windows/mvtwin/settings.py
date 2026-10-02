@@ -36,10 +36,21 @@ class Settings(QObject):
         self._store.sync()
         self.changed.emit()
 
-    appearance = property(lambda self: self._get("appearance"), lambda self, v: self._set("appearance", v))
-    check_updates = property(lambda self: self._get("checkForUpdates"), lambda self, v: self._set("checkForUpdates", v))
-    check_indicator_updates = property(
-        lambda self: self._get("checkIndicatorUpdates"), lambda self, v: self._set("checkIndicatorUpdates", v)
+    appearance = property(
+        lambda self: self._get("appearance"), lambda self, v: self._set("appearance", v)
     )
-    verbose = property(lambda self: self._get("verbose"), lambda self, v: self._set("verbose", v))
-    results_folder = property(lambda self: self._get("resultsFolder"), lambda self, v: self._set("resultsFolder", v))
+    check_updates = property(
+        lambda self: self._get("checkForUpdates"),
+        lambda self, v: self._set("checkForUpdates", v),
+    )
+    check_indicator_updates = property(
+        lambda self: self._get("checkIndicatorUpdates"),
+        lambda self, v: self._set("checkIndicatorUpdates", v),
+    )
+    verbose = property(
+        lambda self: self._get("verbose"), lambda self, v: self._set("verbose", v)
+    )
+    results_folder = property(
+        lambda self: self._get("resultsFolder"),
+        lambda self, v: self._set("resultsFolder", v),
+    )

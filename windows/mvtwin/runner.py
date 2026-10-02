@@ -59,7 +59,12 @@ class Runner(QObject):
 
     # MARK: - Running MVT
 
-    def run_mvt(self, invocation: Invocation, title: str, on_finished: Callable[[int], None] | None = None) -> bool:
+    def run_mvt(
+        self,
+        invocation: Invocation,
+        title: str,
+        on_finished: Callable[[int], None] | None = None,
+    ) -> bool:
         """Runs an MVT command with the app-wide options, replacing what the
         console showed before. Never clears the output of a running job."""
         if self.is_running:
@@ -85,7 +90,11 @@ class Runner(QObject):
                 global_args.append("--disable-indicator-update-check")
         args = global_args + invocation.arguments
         secrets = "".join(f"{key}=•••• " for key in sorted(invocation.environment))
-        display = secrets + display_env + " ".join(quote(a) for a in [invocation.tool.value, *args])
+        display = (
+            secrets
+            + display_env
+            + " ".join(quote(a) for a in [invocation.tool.value, *args])
+        )
         return self.run(
             environment.python_executable(),
             environment.mvt_arguments(invocation.tool, args),
@@ -118,7 +127,9 @@ class Runner(QObject):
         process.finished.connect(self._finished)
         process.errorOccurred.connect(self._error)
 
-        self.note("> " + (display or " ".join(quote(a) for a in [str(program), *arguments])))
+        self.note(
+            "> " + (display or " ".join(quote(a) for a in [str(program), *arguments]))
+        )
         self._process = process
         self._buffer.clear()
         self._stop_requested = False
@@ -153,13 +164,18 @@ class Runner(QObject):
 
     def _error(self, error: QProcess.ProcessError) -> None:
         if error == QProcess.ProcessError.FailedToStart and self._process is not None:
-            self.note(f"Could not start {self._process.program()}: {self._process.errorString()}", Level.ERROR)
+            self.note(
+                f"Could not start {self._process.program()}: {self._process.errorString()}",
+                Level.ERROR,
+            )
             self._done(-1)
 
     def _finished(self, code: int, status: QProcess.ExitStatus) -> None:
         self._read()
         if self._buffer:
-            rest = strip_ansi(self._buffer.decode("utf-8", errors="replace").rstrip("\r"))
+            rest = strip_ansi(
+                self._buffer.decode("utf-8", errors="replace").rstrip("\r")
+            )
             self._buffer.clear()
             self._append(rest, classify(rest))
         if self._stop_requested or status == QProcess.ExitStatus.CrashExit:

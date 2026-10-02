@@ -13,7 +13,9 @@ SWIFT = REPO / "macos" / "MVTGUI"
 
 
 def contract():
-    spec = importlib.util.spec_from_file_location("contract", REPO / "macos" / "scripts" / "check_cli_contract.py")
+    spec = importlib.util.spec_from_file_location(
+        "contract", REPO / "macos" / "scripts" / "check_cli_contract.py"
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -67,9 +69,15 @@ def test_same_commands_as_the_macos_app():
 
 def test_known_extra_indicator_files_match_the_macos_app():
     swift = (SWIFT / "Services" / "IndicatorsIndex.swift").read_text(encoding="utf-8")
-    assert set(re.findall(r'\(repo: "([^"]+)", path: "([^"]+)"\)', swift)) == set(indicators.KNOWN_EXTRA_FILES)
-    repos = re.findall(r'SourceRepository\(owner: "([^"]+)", repo: "([^"]+)", branch: "([^"]+)"', swift)
-    assert repos == [(s.owner, s.repo, s.branch) for s in indicators.SOURCE_REPOSITORIES]
+    assert set(re.findall(r'\(repo: "([^"]+)", path: "([^"]+)"\)', swift)) == set(
+        indicators.KNOWN_EXTRA_FILES
+    )
+    repos = re.findall(
+        r'SourceRepository\(owner: "([^"]+)", repo: "([^"]+)", branch: "([^"]+)"', swift
+    )
+    assert repos == [
+        (s.owner, s.repo, s.branch) for s in indicators.SOURCE_REPOSITORIES
+    ]
 
 
 def test_secrets_go_in_the_environment():
@@ -83,7 +91,10 @@ def test_secrets_go_in_the_environment():
 
     form = full_form("androidCheckAndroidQF")
     invocation = form.invocation()
-    assert invocation.environment == {"MVT_ANDROID_BACKUP_PASSWORD": "secret", "MVT_VT_API_KEY": "vt"}
+    assert invocation.environment == {
+        "MVT_ANDROID_BACKUP_PASSWORD": "secret",
+        "MVT_VT_API_KEY": "vt",
+    }
     assert invocation.arguments[-2:] == ["--non-interactive", str(REPO)]
     assert invocation.only_passed_indicators
 
@@ -108,7 +119,10 @@ def test_validation():
 
     decrypt = CommandForm(COMMANDS["iosDecryptBackup"])
     decrypt.input_path = str(REPO)
-    assert decrypt.validation_error() == "Choose a destination folder for the decrypted backup."
+    assert (
+        decrypt.validation_error()
+        == "Choose a destination folder for the decrypted backup."
+    )
     decrypt.destination_path = "dest"
     assert decrypt.validation_error() == "Enter the backup password."
 
@@ -166,7 +180,10 @@ indicators:
 
 def test_index_parsing():
     sets = indicators.parse_index(INDEX)
-    assert [s.name for s in sets] == ["NSO Group Pegasus Indicators of Compromise", "Other"]
+    assert [s.name for s in sets] == [
+        "NSO Group Pegasus Indicators of Compromise",
+        "Other",
+    ]
     assert sets[0].download_url == (
         "https://raw.githubusercontent.com/mvt-project/mvt-indicators/main/2021-07-18_nso/pegasus.stix2"
     )
@@ -176,12 +193,17 @@ def test_index_parsing():
 
 def test_file_names_match_mvt():
     """contract check_indicator_downloads verifies MVT names this file the same."""
-    s = indicators.IndicatorSet("x", "https://raw.githubusercontent.com/o/r/main/dir/x.stix2")
+    s = indicators.IndicatorSet(
+        "x", "https://raw.githubusercontent.com/o/r/main/dir/x.stix2"
+    )
     assert s.local_file_name == "raw.githubusercontent.com_o_r_main_dir_x.stix2"
 
 
 def test_display_names():
-    assert indicators.display_name("2021-12-16_cytrox/cytrox.stix2") == "Cytrox indicators (2021-12-16)"
+    assert (
+        indicators.display_name("2021-12-16_cytrox/cytrox.stix2")
+        == "Cytrox indicators (2021-12-16)"
+    )
     assert indicators.display_name("stalkerware.stix2") == "Stalkerware indicators"
 
 

@@ -21,7 +21,6 @@ from pathlib import Path
 from .commands import Tool
 
 APP_NAME = "MVT for Windows"
-LAUNCHER_NAME = f"{APP_NAME}.exe"
 
 # <root>/app/mvtwin/environment.py in the portable app.
 ROOT = Path(__file__).resolve().parents[2]
@@ -132,7 +131,11 @@ def is_older(installed: str, latest: str) -> bool:
 
     def parts(version: str) -> list[int] | None:
         pieces = version.split(".")
-        return [int(p) for p in pieces] if all(re.fullmatch(r"\d+", p) for p in pieces) else None
+        return (
+            [int(p) for p in pieces]
+            if all(re.fullmatch(r"\d+", p) for p in pieces)
+            else None
+        )
 
     a, b = parts(installed), parts(latest)
     if not a or not b:
@@ -147,7 +150,15 @@ def can_update_in_place() -> bool:
 
 
 def update_arguments() -> list[str]:
-    return ["-m", "pip", "install", "--upgrade", "--no-warn-script-location", "--disable-pip-version-check", "mvt"]
+    return [
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "--no-warn-script-location",
+        "--disable-pip-version-check",
+        "mvt",
+    ]
 
 
 def remove_script_wrappers() -> None:

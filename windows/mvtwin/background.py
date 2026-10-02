@@ -27,7 +27,9 @@ class _Task(QRunnable):
         self.relay.done.emit(result, error)
 
 
-def run_in_background(work: Callable, callback: Callable[[object, Exception | None], None]) -> None:
+def run_in_background(
+    work: Callable, callback: Callable[[object, Exception | None], None]
+) -> None:
     """Calls `work()` on a pool thread, then `callback(result, error)` on the
     UI thread."""
     relay = _Relay()
