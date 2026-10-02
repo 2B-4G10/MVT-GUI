@@ -3,4 +3,4 @@
 Kept free of imports so MVT's own processes can start quickly.
 """
 
-__version__ = "4.0.0"
+__version__ = "4.0.1"
