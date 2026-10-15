@@ -18,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -34,13 +35,26 @@ def version(tag: str) -> tuple[int, ...]:
     return tuple(int(part) for part in tag.lstrip("v").split("."))
 
 
+def retried(call):
+    """Runs a network call, retrying so a dropped connection doesn't fail the run."""
+    for attempt in range(4):
+        try:
+            return call()
+        except (OSError, subprocess.SubprocessError):
+            if attempt == 3:
+                raise
+            time.sleep(10 * (attempt + 1))
+
+
 def release_tags(repo: str) -> set[str]:
-    result = subprocess.run(
-        ["git", "ls-remote", "--tags", "--refs", f"https://github.com/{repo}.git"],
-        capture_output=True,
-        text=True,
-        check=True,
-        timeout=60,
+    result = retried(
+        lambda: subprocess.run(
+            ["git", "ls-remote", "--tags", "--refs", f"https://github.com/{repo}.git"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=60,
+        )
     )
     tags = (line.rsplit("refs/tags/", 1)[-1] for line in result.stdout.splitlines())
     return {tag for tag in tags if RELEASE_TAG.match(tag)}
@@ -60,8 +74,11 @@ def newer_pin(current: str, tags: set[str]) -> str | None:
 
 
 def fetch(url: str) -> bytes:
-    with urllib.request.urlopen(url, timeout=60) as response:
-        return response.read()
+    def get() -> bytes:
+        with urllib.request.urlopen(url, timeout=60) as response:
+            return response.read()
+
+    return retried(get)
 
 
 def pypi_version(package: str) -> str:
