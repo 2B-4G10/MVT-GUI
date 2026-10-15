@@ -34,6 +34,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -45,7 +46,7 @@ LAUNCHER = f"{APP_NAME}.exe"
 # The newest Python that every locked MVT dependency has Windows wheels for.
 # check_updates.py reports newer releases.
 PYTHON_VERSION = "3.14.8"
-PYSIDE_VERSION = "6.11.2"
+PYSIDE_VERSION = "6.12.0"
 PIP_VERSION = "26.2.1"
 
 # Qt pieces the app uses. Everything else in PySide6-Essentials (QML, Quick,
@@ -99,8 +100,17 @@ def download(url: str, cache: Path) -> Path:
     target = cache / url.rsplit("/", 1)[-1]
     if not target.exists():
         log(f"Downloading {url}")
-        with urllib.request.urlopen(url, timeout=120) as response:
-            target.write_bytes(response.read())
+        # Retried, so a dropped connection doesn't fail a build.
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(url, timeout=120) as response:
+                    data = response.read()
+                break
+            except OSError:
+                if attempt == 3:
+                    raise
+                time.sleep(10 * (attempt + 1))
+        target.write_bytes(data)
     return target
 
 

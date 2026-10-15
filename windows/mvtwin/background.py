@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import atexit
 from collections.abc import Callable
 
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal
@@ -24,7 +25,10 @@ class _Task(QRunnable):
             result, error = self.work(), None
         except Exception as exc:  # reported to the callback
             result, error = None, exc
-        self.relay.done.emit(result, error)
+        try:
+            self.relay.done.emit(result, error)
+        except RuntimeError:  # the app quit while this ran
+            pass
 
 
 def run_in_background(
@@ -41,3 +45,12 @@ def run_in_background(
 
     relay.done.connect(finish)
     QThreadPool.globalInstance().start(_Task(work, relay))
+
+
+@atexit.register
+def _wait_for_tasks() -> None:
+    """Lets running tasks finish before Python exits. PySide deletes the
+    remaining Qt objects as the interpreter shuts down, after these handlers
+    run, and a task still running then would signal a deleted relay from its
+    thread."""
+    QThreadPool.globalInstance().waitForDone(20_000)

@@ -89,8 +89,12 @@ jobs:
         id: fetch
         run: |
           git check-ref-format --branch "$UPSTREAM_BRANCH" > /dev/null
-          git fetch --no-tags "https://github.com/${UPSTREAM_REPO}.git" \
-            "+refs/heads/${UPSTREAM_BRANCH}:refs/remotes/upstream/${UPSTREAM_BRANCH}"
+          for attempt in 1 2 3 4; do
+            git fetch --no-tags "https://github.com/${UPSTREAM_REPO}.git" \
+              "+refs/heads/${UPSTREAM_BRANCH}:refs/remotes/upstream/${UPSTREAM_BRANCH}" && break
+            [ "$attempt" = 4 ] && exit 1
+            sleep $((attempt * 15))
+          done
           behind=$(git rev-list --count "HEAD..upstream/${UPSTREAM_BRANCH}")
           echo "behind=${behind}" >> "$GITHUB_OUTPUT"
           echo "::notice::${BASE_BRANCH} is ${behind} commit(s) behind ${UPSTREAM_REPO}@${UPSTREAM_BRANCH}"
@@ -203,6 +207,24 @@ jobs:
         if: steps.merge.outputs.problem != '' || steps.push.outputs.problem != ''
         run: exit 1
 
+  # GitHub turns off schedules in a public repository after 60 days without
+  # activity; this keeps them on through a quiet stretch upstream.
+  keepalive:
+    name: Keep the schedules on
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Re-enable the scheduled workflows
+        run: |
+          for workflow in sync-upstream.yml weekly-check.yml; do
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow}/enable" --silent \
+              || echo "::warning::Couldn't re-enable ${workflow}."
+          done
+
   gui-checks:
     name: GUI checks
     needs: merge
@@ -227,12 +249,14 @@ jobs:
         with:
           ref: ${{ needs.merge.outputs.sha }}
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v10.2.0
+      - uses: astral-sh/setup-uv@v10.3.0
       - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - run: uv sync --locked --group dev
-      - run: uv run pytest -v
+      # Tests that fail are run once more, so a network hiccup doesn't hold
+      # the sync back a day; a real failure fails both times.
+      - run: uv run pytest -v || uv run pytest -v --last-failed
 
   publish:
     name: Update default branch
