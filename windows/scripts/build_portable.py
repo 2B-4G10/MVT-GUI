@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import re
 import shutil
 import subprocess
@@ -86,7 +87,7 @@ SYSTEM_DLL = re.compile(
     r"d2d1|comctl32|rpcrt4|ntdll|msvcrt|ucrtbase|cfgmgr32|powrprof|dxcore|propsys|shcore|"
     r"windowscodecs|winhttp|wininet|dnsapi|mswsock|psapi|dbghelp|userenv|wldap32|normaliz|"
     r"cabinet|oleacc|uiautomationcore|wevtapi|msimg32|hid|imagehlp|bcryptprimitives|icuuc|icuin|icu|"
-    r"d3dcompiler_47)\.dll$",
+    r"d3dcompiler_47|mscms)\.dll$",
     re.IGNORECASE,
 )
 
@@ -265,14 +266,19 @@ def compile_bytecode(root: Path) -> None:
 
 def check_dlls(root: Path) -> None:
     """Every DLL a binary in the folder imports must be in the folder or be
-    part of Windows, so the app can't fail with a missing DLL."""
+    part of Windows, so the app can't fail with a missing DLL. One that isn't
+    in SYSTEM_DLL but is in the build machine's System32 is reported rather
+    than failing the build: it's almost certainly part of Windows too, and
+    belongs in SYSTEM_DLL once checked."""
     import pefile
+
+    system32 = Path(os.environ.get("SystemRoot", r"C:\Windows")) / "System32"
 
     binaries = [
         p for p in root.rglob("*") if p.suffix.lower() in (".exe", ".dll", ".pyd")
     ]
     present = {p.name.lower() for p in binaries}
-    missing = []
+    missing, unlisted = [], []
     for path in binaries:
         pe = pefile.PE(str(path), fast_load=True)
         pe.parse_data_directories(
@@ -280,9 +286,16 @@ def check_dlls(root: Path) -> None:
         )
         for entry in getattr(pe, "DIRECTORY_ENTRY_IMPORT", []):
             name = entry.dll.decode().lower()
-            if name not in present and not SYSTEM_DLL.search(name):
-                missing.append(f"{path.relative_to(root)} needs {name}")
+            if name in present or SYSTEM_DLL.search(name):
+                continue
+            needs = f"{path.relative_to(root)} needs {name}"
+            if (system32 / name).is_file():
+                unlisted.append(needs)
+            else:
+                missing.append(needs)
         pe.close()
+    for needs in sorted(set(unlisted)):
+        print(f"::warning::{needs}, which Windows has but SYSTEM_DLL doesn't list.")
     if missing:
         raise SystemExit("Missing DLLs:\n  " + "\n  ".join(sorted(set(missing))))
     log(f"All {len(binaries)} binaries find the DLLs they need")
