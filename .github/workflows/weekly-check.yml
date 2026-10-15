@@ -8,9 +8,11 @@ name: Weekly check
 #   fine-grained personal access token for this repository with Contents and
 #   Workflows set to "Read and write". The same script finds newer Python,
 #   PySide6 and pip releases for the Windows app.
-# - MVT's dependencies: audits the locked Python packages for known
-#   vulnerabilities. uv.lock comes from upstream, so fixes arrive with the
-#   daily sync.
+# - Dependencies: audits the packages the Windows app ships and MVT's locked
+#   packages for known vulnerabilities (macos/scripts/audit_dependencies.py).
+#   Only one in a package this fork pins fails the run. The rest are
+#   warnings: uv.lock and MVT's pins come from upstream, so their fixes
+#   arrive with the daily sync and the next MVT release.
 # - The MVT release people install: checks the latest MVT on PyPI still has
 #   everything the app uses.
 # - The upstream sync: fails if the fork has fallen behind mvt-project/mvt.
@@ -77,19 +79,8 @@ jobs:
         with:
           ref: ${{ env.BASE_BRANCH }}
       - uses: astral-sh/setup-uv@v10.2.0
-      - name: Audit the locked packages
-        run: |
-          uv export --locked --no-dev --no-emit-project --format requirements-txt > requirements.txt
-          {
-            echo "### Dependency audit"
-            echo
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          status=0
-          uvx pip-audit --strict --disable-pip --no-deps -r requirements.txt > audit.txt 2>&1 || status=$?
-          cat audit.txt
-          { cat audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          exit "$status"
+      - name: Audit the Windows app's packages and uv.lock
+        run: python3 macos/scripts/audit_dependencies.py
 
   pypi-release:
     name: Latest MVT release works with the app
