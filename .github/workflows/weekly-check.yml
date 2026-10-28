@@ -120,7 +120,7 @@ jobs:
             [ "$attempt" = 4 ] && exit 1
             sleep $((attempt * 15))
           done
-          behind=$(git rev-list --count HEAD..upstream/main)
+          behind=$(git rev-list --count "$(cat .github/upstream-commit)..upstream/main")
           newest=$(git log -1 --format=%ct upstream/main)
           echo "### Upstream sync" >> "$GITHUB_STEP_SUMMARY"
           echo "\`${BASE_BRANCH}\` is ${behind} commit(s) behind mvt-project/mvt." >> "$GITHUB_STEP_SUMMARY"

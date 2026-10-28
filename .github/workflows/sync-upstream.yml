@@ -2,7 +2,10 @@ name: Sync upstream
 # Keeps this fork current with mvt-project/mvt.
 #
 # Once a day, new commits on upstream's main branch are merged into this
-# fork's default branch, but only after the merged code has passed upstream's
+# fork's default branch as one squashed commit, so upstream's commit history
+# (its authors and trailers) is not copied into this fork. The upstream commit
+# last merged is recorded in .github/upstream-commit, which is the base of the
+# next merge. This only happens after the merged code has passed upstream's
 # test suite, the macOS app build and the GUI's CLI contract check
 # (macos/scripts/check_cli_contract.py). If the merge conflicts with this
 # fork's changes, or a check fails, the default branch is left alone and the
@@ -42,6 +45,8 @@ env:
   UPSTREAM_BRANCH: ${{ inputs.upstream_branch || 'main' }}
   BASE_BRANCH: ${{ github.event.repository.default_branch || github.ref_name }}
   BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  # The upstream commit the default branch was last synced to.
+  SYNCED_FILE: .github/upstream-commit
   # Files this fork rewrote; upstream changes to them are not merged.
   FORK_OWNED_FILES: README.md
   # Upstream paths this fork doesn't carry (docs site, Docker, project
@@ -95,7 +100,10 @@ jobs:
             [ "$attempt" = 4 ] && exit 1
             sleep $((attempt * 15))
           done
-          behind=$(git rev-list --count "HEAD..upstream/${UPSTREAM_BRANCH}")
+          synced=$(cat "$SYNCED_FILE")
+          git cat-file -e "${synced}^{commit}" || { echo "::error::${SYNCED_FILE} names ${synced}, which isn't an upstream commit."; exit 1; }
+          echo "synced=${synced}" >> "$GITHUB_OUTPUT"
+          behind=$(git rev-list --count "${synced}..upstream/${UPSTREAM_BRANCH}")
           echo "behind=${behind}" >> "$GITHUB_OUTPUT"
           echo "::notice::${BASE_BRANCH} is ${behind} commit(s) behind ${UPSTREAM_REPO}@${UPSTREAM_BRANCH}"
 
@@ -104,6 +112,7 @@ jobs:
         if: steps.fetch.outputs.behind != '0'
         env:
           BEHIND: ${{ steps.fetch.outputs.behind }}
+          SYNCED: ${{ steps.fetch.outputs.synced }}
           SYNC_BRANCH: ${{ steps.mode.outputs.sync_branch }}
         run: |
           git config user.name "github-actions[bot]"
@@ -128,7 +137,7 @@ jobs:
           {
             echo "Merges **${BEHIND}** commit(s) from [${UPSTREAM_REPO}](https://github.com/${UPSTREAM_REPO}) \`${UPSTREAM_BRANCH}\` (up to \`${upstream_sha}\`) into \`${BASE_BRANCH}\`."
             echo
-            gui_files=$(git diff --name-only "${base}...${upstream}" -- \
+            gui_files=$(git diff --name-only "$SYNCED" "$upstream" -- \
               src/mvt/ios/cli.py src/mvt/android/cli.py src/mvt/cli.py \
               src/mvt/common/log.py src/mvt/common/alerts.py src/mvt/common/command.py \
               src/mvt/common/config.py src/mvt/common/options.py src/mvt/common/help.py)
@@ -139,17 +148,26 @@ jobs:
               echo
             fi
             echo "### Upstream commits"
-            git log --no-merges --format='- %s (%h)' "${base}..${upstream}" | head -n 60
+            git log --no-merges --format='- %s (%h)' "${SYNCED}..${upstream}" | head -n 60
           } > "$report/summary.md"
           cat "$report/summary.md" >> "$GITHUB_STEP_SUMMARY"
 
-          # Merges a ref, keeping this fork's own FORK_OWNED_FILES and dropping
-          # FORK_REMOVED_PATHS and upstream-only workflows, then commits with
-          # the given -m messages. Returns 1 on a real conflict.
-          try_merge() {
-            ref=$1; shift
-            git merge --no-ff --no-commit "$ref" || true
-            git rev-parse -q --verify MERGE_HEAD > /dev/null || return 0 # already up to date
+          # True for paths whose upstream changes are never merged: this
+          # fork's own FORK_OWNED_FILES, FORK_REMOVED_PATHS and upstream-only
+          # workflows.
+          is_skipped() {
+            for path in $FORK_OWNED_FILES $FORK_REMOVED_PATHS; do
+              case "$1" in "$path" | "$path"/*) return 0 ;; esac
+            done
+            case "$1" in
+              .github/workflows/*)
+                case " $FORK_WORKFLOWS " in *" ${1#.github/workflows/} "*) return 1 ;; esac
+                return 0 ;;
+            esac
+            return 1
+          }
+          # Puts the skipped paths back the way this fork has them.
+          tidy() {
             for path in $FORK_OWNED_FILES; do
               git checkout HEAD -- "$path" 2> /dev/null || true
             done
@@ -157,26 +175,45 @@ jobs:
               git rm -r -q -f --ignore-unmatch -- "$path"
             done
             git ls-files -- .github/workflows | sort -u | while read -r file; do
-              case " $FORK_WORKFLOWS " in
-                *" ${file#.github/workflows/} "*) ;;
-                *) git rm -q -f --ignore-unmatch -- "$file" ;;
-              esac
+              if is_skipped "$file"; then git rm -q -f --ignore-unmatch -- "$file"; fi
             done
-            if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+          }
+          conflict() {
+            echo "problem=conflict" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          # Bring in what changed on the default branch since the commits
+          # pushed to the sync branch.
+          if [ "$start" != "$base" ]; then
+            if ! git merge --no-ff --no-edit -m "Merge ${BASE_BRANCH} into ${SYNC_BRANCH}" "$base"; then
               git diff --name-only --diff-filter=U > "$report/conflicts.txt"
               git merge --abort
-              echo "problem=conflict" >> "$GITHUB_OUTPUT"
-              return 1
+              conflict
             fi
-            git commit -q --no-edit "$@"
-          }
-          if [ "$start" != "$base" ]; then
-            try_merge "$base" -m "Merge ${BASE_BRANCH} into ${SYNC_BRANCH}" || exit 0
           fi
-          try_merge "$upstream" \
-            -m "Merge ${UPSTREAM_REPO}@${upstream_sha} into ${BASE_BRANCH}" \
-            -m "$(git log --no-merges --format='- %s (%h)' "HEAD..${upstream}" | head -n 60)" \
-            || exit 0
+
+          # Squash upstream's changes since the last synced commit into one
+          # commit, so none of upstream's commit metadata lands here.
+          synced=$(cat "$SYNCED_FILE")
+          if [ "$(git rev-parse "${synced}^{commit}")" != "$(git rev-parse "$upstream")" ]; then
+            set +e
+            out=$(git merge-tree --write-tree --name-only --no-messages --merge-base="$synced" HEAD "$upstream")
+            status=$?
+            set -e
+            [ "$status" -le 1 ] || exit "$status"
+            tail -n +2 <<< "$out" | sed '/^$/d' | sort -u | while read -r file; do
+              is_skipped "$file" || echo "$file"
+            done > "$report/conflicts.txt"
+            [ -s "$report/conflicts.txt" ] && conflict
+            rm "$report/conflicts.txt"
+            git read-tree -u --reset "$(head -n 1 <<< "$out")"
+            tidy
+            git rev-parse "$upstream" > "$SYNCED_FILE"
+            git add "$SYNCED_FILE"
+            git commit -q -m "Sync ${UPSTREAM_REPO}@${upstream_sha} into ${BASE_BRANCH}" \
+              -m "$(git log --no-merges --format='- %s (%h)' "${synced}..${upstream}" | head -n 60)"
+          fi
 
       - name: Push the merge to the sync branch
         id: push
@@ -340,10 +377,16 @@ jobs:
                 echo "Resolve them on your computer; the next run continues from there:"
                 echo
                 echo '```bash'
-                echo "git remote add upstream https://github.com/${UPSTREAM_REPO}.git  # once"
-                echo "git fetch upstream"
-                echo "git checkout ${BASE_BRANCH} && git merge upstream/${UPSTREAM_BRANCH}"
-                echo "# fix the conflicts, then: git commit && git push"
+                echo "git checkout ${BASE_BRANCH} && git pull"
+                echo "git fetch --no-tags https://github.com/${UPSTREAM_REPO}.git ${UPSTREAM_BRANCH}"
+                echo "git diff --binary \"\$(cat ${SYNCED_FILE})\" FETCH_HEAD -- . \\"
+                for path in $FORK_OWNED_FILES $FORK_REMOVED_PATHS; do
+                  echo "  ':!${path}' \\"
+                done
+                echo "  | git apply -3 --index"
+                echo "# fix the conflicts and drop any new upstream workflows, then:"
+                echo "git rev-parse FETCH_HEAD > ${SYNCED_FILE}"
+                echo "git add -A && git commit -m \"Sync ${UPSTREAM_REPO}\" && git push"
                 echo '```'
                 ;;
               push)
