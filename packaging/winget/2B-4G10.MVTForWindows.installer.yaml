@@ -10,7 +10,7 @@ NestedInstallerFiles:
     PortableCommandAlias: mvt-gui
 ArchiveBinariesDependOnPath: true
 MinimumOSVersion: 10.0.17763.0
-ReleaseDate: 2026-11-23
+ReleaseDate: 2026-11-27
 Installers:
   - Architecture: x64
     InstallerUrl: https://github.com/Dream1Works/MVT-GUI/releases/download/gui-v4.0.2-beta/MVT-for-Windows-4.0.2-beta.zip
