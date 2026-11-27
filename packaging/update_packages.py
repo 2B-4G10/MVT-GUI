@@ -12,7 +12,7 @@
 Release apps runs it after publishing a release and pushes the result to
 the default branch, so that
 
-    brew tap 2b-4g10/mvt-gui https://github.com/2B-4G10/MVT-GUI
+    brew tap dream1works/mvt-gui https://github.com/Dream1Works/MVT-GUI
     brew install --cask mvt-gui
 
 installs the newest Mac app, and packaging/winget holds manifests ready to
@@ -31,7 +31,7 @@ CASK = REPO / "Casks" / "mvt-gui.rb"
 WINGET = REPO / "packaging" / "winget"
 
 OWNER = "2B-4G10"
-REPOSITORY = f"https://github.com/{OWNER}/MVT-GUI"
+REPOSITORY = "https://github.com/Dream1Works/MVT-GUI"
 PACKAGE_ID = "2B-4G10.MVTForWindows"
 MANIFEST_VERSION = "1.10.0"
 SCHEMA = "https://aka.ms/winget-manifest.{kind}.1.10.0.schema.json"

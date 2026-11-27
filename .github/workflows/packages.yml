@@ -76,8 +76,8 @@ jobs:
       - name: Install with Homebrew
         # What people run: tap this repository, install the cask.
         run: |
-          brew tap 2b-4g10/mvt-gui "https://github.com/${GITHUB_REPOSITORY}"
-          brew install --cask 2b-4g10/mvt-gui/mvt-gui
+          brew tap dream1works/mvt-gui "https://github.com/${GITHUB_REPOSITORY}"
+          brew install --cask dream1works/mvt-gui/mvt-gui
           test -d /Applications/MVTGUI.app
           codesign --verify --strict --deep /Applications/MVTGUI.app
           brew uninstall --cask mvt-gui

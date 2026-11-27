@@ -13,7 +13,7 @@ MinimumOSVersion: 10.0.17763.0
 ReleaseDate: 2026-11-23
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/2B-4G10/MVT-GUI/releases/download/gui-v4.0.2-beta/MVT-for-Windows-4.0.2-beta.zip
+    InstallerUrl: https://github.com/Dream1Works/MVT-GUI/releases/download/gui-v4.0.2-beta/MVT-for-Windows-4.0.2-beta.zip
     InstallerSha256: AECE8344C7BA9432971E73CA6DD98DDC78C67A002B76E8ACFF371C78029BD4C4
 ManifestType: installer
 ManifestVersion: 1.10.0

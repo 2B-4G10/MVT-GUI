@@ -9,26 +9,26 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/v/release/2B-4G10/MVT-GUI?style=flat-square&label=download&logo=github&color=2ea44f" alt="Latest release"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/v/release/Dream1Works/MVT-GUI?style=flat-square&label=download&logo=github&color=2ea44f" alt="Latest release"></a>
   <a href="#get-the-app"><img src="https://img.shields.io/badge/macOS-13%2B-000000?style=flat-square&logo=apple&logoColor=white" alt="macOS 13 or newer"></a>
   <a href="#windows"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=flat-square&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgxMS40djExLjRIMHptMTIuNiAwSDI0djExLjRIMTIuNnpNMCAxMi42aDExLjRWMjRIMHptMTIuNiAwSDI0VjI0SDEyLjZ6Ii8+PC9zdmc+" alt="Windows 10 or 11"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases"><img src="https://img.shields.io/github/downloads/2B-4G10/MVT-GUI/total?style=flat-square&label=downloads&color=blue" alt="Total downloads"></a>
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2F2B-4G10%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fdownloads-macos.json&style=flat-square" alt="macOS downloads"></a>
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2F2B-4G10%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fdownloads-windows.json&style=flat-square" alt="Windows downloads"></a>
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/downloads/2B-4G10/MVT-GUI/latest/total?style=flat-square&label=latest%20release&color=blue" alt="Downloads of the latest release"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases"><img src="https://img.shields.io/github/downloads/Dream1Works/MVT-GUI/total?style=flat-square&label=downloads&color=blue" alt="Total downloads"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FDream1Works%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fdownloads-macos.json&style=flat-square" alt="macOS downloads"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FDream1Works%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fdownloads-windows.json&style=flat-square" alt="Windows downloads"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/downloads/Dream1Works/MVT-GUI/latest/total?style=flat-square&label=latest%20release&color=blue" alt="Downloads of the latest release"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases/latest"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2F2B-4G10%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fmvt-bundled.json&style=flat-square" alt="MVT bundled with the Windows app"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FDream1Works%2FMVT-GUI%2Fmain%2F.github%2Fbadges%2Fmvt-bundled.json&style=flat-square" alt="MVT bundled with the Windows app"></a>
   <a href="https://pypi.org/project/mvt/"><img src="https://img.shields.io/pypi/v/mvt?style=flat-square&label=latest%20MVT&logo=pypi&logoColor=white" alt="Latest MVT on PyPI"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/2B-4G10/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/release-date/2B-4G10/MVT-GUI?style=flat-square&label=released" alt="Release date"></a>
-  <a href="https://github.com/2B-4G10/MVT-GUI/stargazers"><img src="https://img.shields.io/github/stars/2B-4G10/MVT-GUI?style=flat-square&logo=github&color=yellow" alt="Stars"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/release-date/Dream1Works/MVT-GUI?style=flat-square&label=released" alt="Release date"></a>
+  <a href="https://github.com/Dream1Works/MVT-GUI/stargazers"><img src="https://img.shields.io/github/stars/Dream1Works/MVT-GUI?style=flat-square&logo=github&color=yellow" alt="Stars"></a>
   <a href="EULA.md"><img src="https://img.shields.io/badge/license-proprietary-orange?style=flat-square" alt="Proprietary: MVT GUI EULA"></a>
 </p>
 
@@ -69,7 +69,7 @@ International's Security Lab.
 ## <img src="https://cdn.simpleicons.org/apple/000000/ffffff" width="20" height="20" alt=""> Get the app
 
 1. Download the latest `MVT-GUI-…-macOS.zip` from
-   [Releases](https://github.com/2B-4G10/MVT-GUI/releases).
+   [Releases](https://github.com/Dream1Works/MVT-GUI/releases).
 2. Unzip it and move **MVTGUI.app** from the new folder to your
    **Applications** folder.
 3. The first time only: right-click the app, choose **Open**, then **Open**
@@ -81,7 +81,7 @@ You need macOS 13 Ventura or newer. Python comes with the app, so
 Or install it with [Homebrew](https://brew.sh):
 
 ```sh
-brew tap 2b-4g10/mvt-gui https://github.com/2B-4G10/MVT-GUI
+brew tap dream1works/mvt-gui https://github.com/Dream1Works/MVT-GUI
 brew install --cask mvt-gui
 ```
 
@@ -91,7 +91,7 @@ There's also a portable app for Windows 10 and 11 (64-bit), with MVT
 included:
 
 1. Download the latest `MVT-for-Windows-….zip` from
-   [Releases](https://github.com/2B-4G10/MVT-GUI/releases).
+   [Releases](https://github.com/Dream1Works/MVT-GUI/releases).
 2. Unzip it into Documents, your Desktop or a USB drive.
 3. Open the **MVT for Windows** folder and double-click
    **MVT for Windows.exe**. Nothing is installed, and no administrator

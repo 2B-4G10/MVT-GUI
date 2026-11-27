@@ -9,10 +9,10 @@ cask "mvt-gui" do
   version "4.0.2-beta"
   sha256 "f1059a64ea7d034df9cd49145334f5c27f57ecbd1af88b9f49ba2ab7990ad2a6"
 
-  url "https://github.com/2B-4G10/MVT-GUI/releases/download/gui-v#{version}/MVT-GUI-#{version}-macOS.zip"
+  url "https://github.com/Dream1Works/MVT-GUI/releases/download/gui-v#{version}/MVT-GUI-#{version}-macOS.zip"
   name "MVT GUI"
   desc "Desktop app for the Mobile Verification Toolkit"
-  homepage "https://github.com/2B-4G10/MVT-GUI"
+  homepage "https://github.com/Dream1Works/MVT-GUI"
 
   depends_on macos: ">= :ventura"
 
