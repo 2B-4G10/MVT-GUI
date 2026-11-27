@@ -28,15 +28,14 @@
     <th width="50%"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg" width="18" height="18" alt=""> Windows</th>
   </tr>
   <tr>
-    <td>macOS 13 Ventura or newer</td>
+    <td>macOS 13 Ventura or newer, Apple silicon</td>
     <td>Windows 10 or 11, 64-bit</td>
   </tr>
   <tr>
     <td>
-      1. Download <code>MVT-GUI-…-macOS.zip</code> from
-      <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest">the latest release</a>.<br>
-      2. Unzip it and move <b>MVTGUI.app</b> to <b>Applications</b>.<br>
-      3. First time only: right-click the app, choose <b>Open</b>, then <b>Open</b> again.
+      <b>Coming to the Mac App Store.</b><br>
+      MVT comes built in, and the App Store keeps it up to date.
+      There is no Mac download here.
     </td>
     <td>
       1. Download <code>MVT-for-Windows-….zip</code> from
@@ -47,20 +46,12 @@
   </tr>
 </table>
 
-Prefer [Homebrew](https://brew.sh) on a Mac?
-
-```sh
-brew tap dream1works/mvt-gui https://github.com/Dream1Works/MVT-GUI
-brew install --cask mvt-gui
-```
-
 Check a download against `SHA256SUMS.txt` in its release if you want to be
 sure it is the real one.
 
 ## 🚀 Get started
 
-1. **Mac:** **Setup** → **Install MVT** (Python comes with the app).
-   **Windows:** nothing to do, MVT is included.
+1. Nothing to install: MVT is built into both apps.
 2. **Indicators** → **Download All**. Indicators are lists of known spyware
    traces from [mvt-indicators](https://github.com/mvt-project/mvt-indicators),
    [Amnesty International](https://github.com/AmnestyTech/investigations) and
@@ -71,15 +62,18 @@ sure it is the real one.
 <summary><b>📱 Check an iPhone</b></summary>
 
 1. Connect the iPhone with a cable, unlock it, and tap **Trust** if it asks.
-2. Open **Back Up iPhone**, choose a folder, keep **Encrypt the backup** on,
-   set a password and press **Back Up**.
-3. Press **Decrypt Backup**, then **Decrypt**, then **Check Decrypted Backup**.
+2. Make an encrypted backup:
+   - **Mac:** select the iPhone in Finder, tick **Encrypt local backup**,
+     set a password and press **Back Up Now**.
+   - **Windows:** open **Back Up iPhone**, choose a folder, keep
+     **Encrypt the backup** on, set a password and press **Back Up**. It needs
+     Apple's **Apple Devices** app (or iTunes) installed.
+3. Open **Decrypt Backup**, choose the backup and press **Decrypt**, then
+   **Check Decrypted Backup**.
 4. Choose a **Results folder** and press **Run Check**.
 
-A backup you made yourself with Finder, iTunes or the Apple Devices app
-works too: start at step 3. If the iPhone's backups were already encrypted,
-use the password you set back then. On Windows, **Back Up iPhone** needs
-Apple's **Apple Devices** app (or iTunes) installed.
+If the iPhone's backups were already encrypted, use the password you set
+back then.
 
 <p align="center"><img src="images/check-backup.png" width="80%" alt="Checking an iPhone backup"></p>
 </details>
@@ -87,12 +81,24 @@ Apple's **Apple Devices** app (or iTunes) installed.
 <details>
 <summary><b>🤖 Check an Android phone</b></summary>
 
-1. On the phone, turn on **Developer options** (tap **Build number** seven
-   times in **Settings → About phone**), then **USB debugging**.
-2. Connect it with a cable and allow USB debugging for this computer.
-3. Open **Collect with AndroidQF**, choose a folder and press
+On the phone, turn on **Developer options**: tap **Build number** seven
+times in **Settings → About phone**.
+
+**Mac**, no cable needed:
+
+1. In **Developer options**, tap **Take bug report**, then **Full report**.
+2. When the phone says it's ready, tap the notification and send the .zip
+   to your Mac (AirDrop, Quick Share, a cable or a message to yourself).
+3. Open **Get a Bug Report**, press **Check the Newest in Downloads**, then
+   **Run Check**.
+
+**Windows**, with a cable:
+
+1. In **Developer options**, turn on **USB debugging**, connect the phone
+   and allow USB debugging for this computer.
+2. Open **Collect with AndroidQF**, choose a folder and press
    **Open AndroidQF**. It opens in a window and asks a few questions.
-4. When it's done, press **Check the Newest Acquisition**, then **Run Check**.
+3. When it's done, press **Check the Newest Acquisition**, then **Run Check**.
 
 <p align="center"><img src="images/check-androidqf.png" width="80%" alt="Checking an AndroidQF acquisition"></p>
 </details>
@@ -121,11 +127,11 @@ Apple's **Apple Devices** app (or iTunes) installed.
 
 | | |
 |---|---|
-| 📲 **Back up from the app** | Back up an iPhone or collect from an Android phone without other tools. |
+| 📲 **Get the data easily** | Check an Android phone from a bug report it makes itself (Mac), or back up an iPhone and collect from Android in the app (Windows). |
 | 🧭 **Guided checks** | Every MVT check as a simple form, with live, color-coded output. |
 | 🛡️ **Fresh indicators** | Warns when indicators are a week old, and can update them before each check. |
 | 📊 **Clear results** | Alerts by severity, a timeline, and a report to share. |
-| 🔔 **Stays out of the way** | A notification when a long check ends, and a note when a new version is out. |
+| 🔔 **Stays out of the way** | A notification when a long check ends. |
 | 🌗 **Light and dark** | Follows your system, or pick one. |
 
 <details>

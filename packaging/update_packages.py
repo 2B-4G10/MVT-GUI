@@ -3,20 +3,15 @@
 # Proprietary: use of this file is governed by the MVT GUI End User
 # License Agreement in the EULA.md file at the root of this repository.
 
-"""Writes the Homebrew cask and the winget manifests for a release.
+"""Writes the winget manifests for a release.
 
     python3 packaging/update_packages.py --version 4.0.2-beta \\
-        --mac-zip dist/MVT-GUI-4.0.2-beta-macOS.zip \\
         --windows-zip dist/MVT-for-Windows-4.0.2-beta.zip
 
-Release apps runs it after publishing a release and pushes the result to
-the default branch, so that
-
-    brew tap dream1works/mvt-gui https://github.com/Dream1Works/MVT-GUI
-    brew install --cask mvt-gui
-
-installs the newest Mac app, and packaging/winget holds manifests ready to
-submit to microsoft/winget-pkgs (see packaging/README.md).
+packages.yml runs it after a release is published and pushes the result to
+the default branch, so that packaging/winget holds manifests ready to submit
+to microsoft/winget-pkgs. The Mac app is sold on the Mac App Store, so there
+is no Homebrew cask.
 """
 
 from __future__ import annotations
@@ -27,7 +22,6 @@ from datetime import date
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-CASK = REPO / "Casks" / "mvt-gui.rb"
 WINGET = REPO / "packaging" / "winget"
 
 OWNER = "2B-4G10"
@@ -52,41 +46,6 @@ def sha256(path: Path) -> str:
 
 def release_url(version: str, name: str) -> str:
     return f"{REPOSITORY}/releases/download/gui-v{version}/{name}"
-
-
-def cask(version: str, digest: str) -> str:
-    return f'''# MVT GUI
-# Copyright (c) 2026 2B-4G10. All rights reserved.
-# Proprietary: use of this file is governed by the MVT GUI End User
-# License Agreement in the EULA.md file at the root of this repository.
-#
-# Written by packaging/update_packages.py for each release.
-
-cask "mvt-gui" do
-  version "{version}"
-  sha256 "{digest}"
-
-  url "{REPOSITORY}/releases/download/gui-v#{{version}}/MVT-GUI-#{{version}}-macOS.zip"
-  name "MVT GUI"
-  desc "Desktop app for the Mobile Verification Toolkit"
-  homepage "{REPOSITORY}"
-
-  depends_on macos: ">= :ventura"
-
-  app "MVT-GUI-#{{version}}/MVTGUI.app"
-
-  zap trash: [
-    "~/Library/Application Support/MVT GUI",
-    "~/Library/Preferences/io.github.mvtgui.MVTGUI.plist",
-  ]
-
-  caveats <<~EOS
-    If macOS says the app can't be checked for malicious software, open it
-    once with right-click > Open, or allow it in System Settings > Privacy &
-    Security. Then press Install MVT on its Setup screen.
-  EOS
-end
-'''
 
 
 def winget_manifests(version: str, digest: str, released: str) -> dict[str, str]:
@@ -146,14 +105,9 @@ def winget_manifests(version: str, digest: str, released: str) -> dict[str, str]
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--version", required=True, help="the release's version, e.g. 4.0.2-beta")
-    parser.add_argument("--mac-zip", type=Path, required=True)
     parser.add_argument("--windows-zip", type=Path, required=True)
     parser.add_argument("--date", default=date.today().isoformat(), help="release date (YYYY-MM-DD)")
     args = parser.parse_args()
-
-    CASK.parent.mkdir(parents=True, exist_ok=True)
-    CASK.write_text(cask(args.version, sha256(args.mac_zip)))
-    print(f"Wrote {CASK.relative_to(REPO)}")
 
     # Only the newest version is kept here; winget-pkgs keeps the history.
     WINGET.mkdir(parents=True, exist_ok=True)
