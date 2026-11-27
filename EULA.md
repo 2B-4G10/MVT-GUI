@@ -112,4 +112,9 @@ EULA under the MVT GUI License 1.0.
 
    This EULA is the entire agreement between you and the Licensor about
    the Software. If any part of it is unenforceable, the rest stays in
-   effect.
+   effect. This EULA is governed by the laws of the country where the
+   Licensor is domiciled, without regard to its conflict-of-laws rules,
+   and its courts have exclusive jurisdiction over any dispute about it.
+   This does not take away any mandatory consumer protection that the law
+   of your own country gives you, including the right to bring a claim
+   there.
