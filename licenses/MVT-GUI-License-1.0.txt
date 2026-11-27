@@ -1,0 +1,78 @@
+MVT GUI License 1.0
+===================
+
+Copyright (c) 2026 2B-4G10. All rights reserved.
+
+This license covers MVT GUI: the Mac app (macos/), the Windows app
+(windows/) and the release downloads built from them (together, "the
+Software"), in every version published on or after 25 November 2026.
+Versions published before that date remain available under the MVT
+License 1.1, as they were released.
+
+MVT itself (src/, tests/ and the copy of MVT inside the Windows download)
+is not covered by this license. It is Copyright (c) 2021-2026 The MVT
+Authors and stays under the MVT License 1.1 in the LICENSE file.
+
+The source code of the Software is published so that anyone can read and
+review it. It is not open source.
+
+1. Using the apps
+
+   You may download, install and run the official release builds of the
+   Software, free of charge, for any lawful purpose that meets section 4.
+
+2. Reading the source code
+
+   You may view and read the source code, and build it from this
+   repository for your own personal evaluation, testing or security
+   review. You may report problems and suggest changes to 2B-4G10.
+
+3. What needs written permission from 2B-4G10
+
+   Except as sections 1 and 2 allow, you may not:
+
+   (a) copy, modify, translate or create derivative works of the Software
+       or any part of its source code;
+   (b) publish, distribute, sublicense, sell, rent or otherwise make
+       available the Software, its source code, modified versions of it or
+       your own builds of it;
+   (c) use any part of its source code in another program or service; or
+   (d) remove or change any copyright, license or attribution notice.
+
+   Forking this repository on GitHub, as GitHub's Terms of Service allow
+   for public repositories, grants no rights beyond this license.
+
+4. Consent
+
+   The Software may only be used to analyse a device with the consent of
+   its owner or user, as the MVT License 1.1 (section 3.0) requires for
+   MVT and for any work that uses it.
+
+5. Third-party components
+
+   The Windows download contains components under their own licenses,
+   listed in THIRD-PARTY-NOTICES.txt. Nothing in this license limits the
+   rights those licenses give you. In particular, you may replace the Qt
+   and PySide6 libraries with modified versions, and reverse engineer the
+   Software as far as needed to debug such modifications, as the GNU LGPL
+   v3 allows.
+
+6. Contributions
+
+   If you send 2B-4G10 a contribution, such as code, a patch or a
+   suggestion, you grant 2B-4G10 a perpetual, worldwide, royalty-free and
+   irrevocable license to use, modify and distribute it under any terms.
+
+7. No warranty
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+   IN NO EVENT SHALL 2B-4G10 BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+8. Termination
+
+   Your rights under this license end automatically if you break any of
+   its terms.

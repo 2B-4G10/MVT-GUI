@@ -1,0 +1,117 @@
+name: Homebrew and winget
+# Points the Homebrew cask (Casks/mvt-gui.rb) and the winget manifests
+# (packaging/winget) at a published release, pushes them to the default
+# branch, then installs the app with Homebrew, validates the winget
+# manifests and scans the Windows zip with Microsoft Defender.
+# Runs when a release is published here (the private source repository's
+# Release apps workflow publishes them); run it from the Actions tab to redo
+# it for a release. The push uses the built-in token, which starts no
+# workflow, so this never releases anything.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published version, e.g. 4.0.2-beta
+        required: true
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        default: ""
+      tag:
+        description: The release's tag, e.g. gui-v4.0.2-beta
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packages
+  cancel-in-progress: false
+
+jobs:
+  packages:
+    name: Update the Homebrew cask and winget manifests
+    runs-on: macos-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag || format('gui-v{0}', inputs.version) }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+      - name: Write the cask and the manifests
+        run: |
+          version="${TAG#gui-v}"
+          mkdir -p "$RUNNER_TEMP/assets"
+          gh release download "$TAG" --pattern '*.zip' --dir "$RUNNER_TEMP/assets"
+          python3 packaging/update_packages.py --version "$version" \
+            --mac-zip "$RUNNER_TEMP/assets/MVT-GUI-${version}-macOS.zip" \
+            --windows-zip "$RUNNER_TEMP/assets/MVT-for-Windows-${version}.zip" \
+            --date "$(gh release view "$TAG" --json publishedAt --jq '.publishedAt[0:10]')"
+      - name: Push them
+        run: |
+          git add Casks packaging/winget
+          if git diff --cached --quiet; then
+            echo "The cask and the manifests are already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Point the Homebrew cask and winget manifests at ${TAG#gui-v}"
+          branch="${{ github.event.repository.default_branch || 'main' }}"
+          for attempt in 1 2 3 4; do
+            git push origin "HEAD:${branch}" && break
+            [ "$attempt" = 4 ] && exit 1
+            sleep $((attempt * 10))
+            git pull -q --rebase origin "${branch}"
+          done
+      - name: Install with Homebrew
+        # What people run: tap this repository, install the cask.
+        run: |
+          brew tap 2b-4g10/mvt-gui "https://github.com/${GITHUB_REPOSITORY}"
+          brew install --cask 2b-4g10/mvt-gui/mvt-gui
+          test -d /Applications/MVTGUI.app
+          codesign --verify --strict --deep /Applications/MVTGUI.app
+          brew uninstall --cask mvt-gui
+
+  winget:
+    name: Check the winget manifests
+    needs: packages
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+      - name: Validate the manifests
+        run: |
+          if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+            Write-Output "::warning::This runner has no winget; the manifests were not validated."
+            exit 0
+          }
+          winget validate --manifest packaging/winget --disable-interactivity
+          if ($LASTEXITCODE -ne 0) { throw "winget validate failed ($LASTEXITCODE)" }
+      - name: Scan the Windows zip with Microsoft Defender
+        # winget-pkgs checks submissions with Defender; this does the same
+        # scan before anyone submits the manifests.
+        run: |
+          $installer = Get-Content packaging/winget/2B-4G10.MVTForWindows.installer.yaml | Select-String "InstallerUrl: (.+)$"
+          $zip = "$env:RUNNER_TEMP\app.zip"
+          Invoke-WebRequest -Uri $installer.Matches[0].Groups[1].Value.Trim() -OutFile $zip
+          $defender = "$env:ProgramFiles\Windows Defender\MpCmdRun.exe"
+          if (-not (Test-Path $defender) -or -not (Get-MpComputerStatus -ErrorAction SilentlyContinue).AntivirusEnabled) {
+            Write-Output "::warning::Microsoft Defender isn't running on this runner; the zip wasn't scanned."
+            exit 0
+          }
+          Expand-Archive $zip "$env:RUNNER_TEMP\app" -Force
+          & $defender -Scan -ScanType 3 -File "$env:RUNNER_TEMP\app" -DisableRemediation
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Defender flagged the Windows zip" }
+          Write-Output "Microsoft Defender found nothing in the Windows zip."

@@ -1,0 +1,94 @@
+name: README badge stats
+
+# Keeps the README's per-OS download counts and bundled-MVT badges current.
+# Writes shields.io endpoint files to .github/badges/ and commits them only
+# when a number changed. Nothing here builds or releases the apps.
+on:
+  schedule:
+    - cron: "41 4 * * *" # daily, 04:41 UTC (before the 05:23 upstream sync)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: badge-stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Update badge stats
+    # Once the releases live in a public repository (RELEASES_REPO), that
+    # repository counts its own downloads.
+    if: vars.RELEASES_REPO == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Count downloads and read the bundled MVT
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --paginate "repos/${REPO}/releases?per_page=100" \
+            --jq '.[].assets[] | "\(.name)\t\(.download_count)"' > "$RUNNER_TEMP/assets.tsv"
+          gh api "repos/${REPO}/releases/latest" > "$RUNNER_TEMP/latest.json"
+          curl -sSfL --retry 4 --retry-all-errors https://pypi.org/pypi/mvt/json > "$RUNNER_TEMP/pypi.json"
+          python3 - "$RUNNER_TEMP" <<'EOF'
+          import json, pathlib, re, sys
+
+          tmp = pathlib.Path(sys.argv[1])
+          assets = [line.rsplit("\t", 1) for line in (tmp / "assets.tsv").read_text().splitlines() if line]
+          latest = json.loads((tmp / "latest.json").read_text())
+          pypi = json.loads((tmp / "pypi.json").read_text())["info"]["version"]
+
+          mac = sum(int(n) for name, n in assets if name.endswith("-macOS.zip"))
+          win = sum(int(n) for name, n in assets
+                    if name.startswith("MVT-for-Windows-") and name.endswith(".zip"))
+
+          windows_logo = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#fff" '
+                          'd="M0 0h11.4v11.4H0zm12.6 0H24v11.4H12.6zM0 12.6h11.4V24H0zm12.6 0H24V24H12.6z"/></svg>')
+          badges = {
+              "downloads-macos": {"label": "macOS downloads", "message": str(mac), "color": "000000",
+                                  "namedLogo": "apple", "logoColor": "white"},
+              "downloads-windows": {"label": "Windows downloads", "message": str(win), "color": "0078D4",
+                                    "logoSvg": windows_logo},
+          }
+
+          found = re.search(r"\*\*Includes\*\* MVT (\d[\w.]*)", latest.get("body") or "")
+          if found:
+              bundled = found.group(1)
+              current = bundled == pypi
+              badges["mvt-bundled"] = {
+                  "label": "bundled MVT",
+                  "message": bundled if current else f"{bundled} (newer: {pypi})",
+                  "color": "brightgreen" if current else "orange",
+                  "namedLogo": "pypi", "logoColor": "white",
+              }
+          else:
+              print(f"::warning::No 'Includes MVT' line in {latest['tag_name']}'s notes; bundled-MVT badge left as is.")
+
+          out = pathlib.Path(".github/badges")
+          out.mkdir(parents=True, exist_ok=True)
+          for name, badge in badges.items():
+              (out / f"{name}.json").write_text(json.dumps({"schemaVersion": 1, **badge}, indent=2) + "\n")
+              print(f"{name}: {badge['message']}")
+          EOF
+
+      - name: Commit changed numbers
+        run: |
+          git add .github/badges
+          if git diff --cached --quiet; then
+            echo "Badges unchanged." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Update the README badge stats"
+          for attempt in 1 2 3 4; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && break
+            sleep $((attempt * 5))
+            git pull -q --rebase origin "${GITHUB_REF_NAME}"
+          done
+          echo "Updated: $(git show --stat --format= HEAD | head -n -1 | awk '{print $1}' | tr '\n' ' ')" >> "$GITHUB_STEP_SUMMARY"

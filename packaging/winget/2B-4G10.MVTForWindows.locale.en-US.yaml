@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
+# Written by packaging/update_packages.py for MVT GUI 4.0.2-beta.
+
+PackageIdentifier: 2B-4G10.MVTForWindows
+PackageVersion: 4.0.2-beta
+PackageLocale: en-US
+Publisher: 2B-4G10
+PublisherUrl: https://github.com/2B-4G10
+PublisherSupportUrl: https://github.com/2B-4G10/MVT-GUI/issues
+PackageName: MVT for Windows
+PackageUrl: https://github.com/2B-4G10/MVT-GUI
+License: Proprietary; MVT is under the MVT License 1.1
+LicenseUrl: https://github.com/2B-4G10/MVT-GUI/blob/main/EULA.md
+ShortDescription: Desktop app for the Mobile Verification Toolkit (MVT)
+Description: A desktop app for the Mobile Verification Toolkit (MVT), which looks for traces of spyware on iPhones and Android phones. Back up a phone, download indicators, run checks and read the results without the command line.
+Moniker: mvt-gui
+Tags:
+  - android
+  - forensics
+  - ios
+  - mvt
+  - privacy
+  - security
+  - spyware
+ReleaseNotesUrl: https://github.com/2B-4G10/MVT-GUI/releases/tag/gui-v4.0.2-beta
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0
