@@ -1,4 +1,8 @@
 <p align="center">
+  <a href="README.ar.md">العربية</a> · <b>English</b> · <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
   <img src="images/icon.png" width="112" height="112" alt="Telltrace icon">
 </p>
 
