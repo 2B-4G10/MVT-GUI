@@ -1,10 +1,11 @@
-MVT GUI End User License Agreement
-==================================
+Telltrace End User License Agreement
+====================================
 
 Copyright (c) 2026 2B-4G10. All rights reserved.
 
 This agreement ("EULA") is between you and 2B-4G10 ("the Licensor"). It
-covers the MVT GUI Mac app and Windows app, in the compiled release builds
+covers the Telltrace Mac app and Windows app (named MVT GUI before
+version 4.0.3), in the compiled release builds
 published by the Licensor, together with their documentation and updates
 ("the Software"), in every version released with this EULA. By installing
 or using the Software you accept this EULA. If you do not accept it, do not
@@ -41,7 +42,7 @@ EULA under the MVT GUI License 1.0.
        service;
    (e) remove, change or hide any copyright, trademark, license or
        attribution notice; or
-   (f) use the names "MVT GUI" or "2B-4G10", or the Software's icons and
+   (f) use the names "Telltrace" or "2B-4G10", or the Software's icons and
        logos, except to refer to the Software accurately.
 
 4. Consent and lawful use

@@ -1,13 +1,13 @@
-# MVT GUI Privacy Policy
+# Telltrace Privacy Policy
 
 *Last updated: November 28, 2026*
 
-MVT GUI checks phones for known signs of spyware. It was built so that
+Telltrace checks phones for known signs of spyware. It was built so that
 nothing about you or your phone ever has to leave your computer.
 
 ## What we collect
 
-Nothing. MVT GUI has no accounts, no analytics, no advertising and no crash
+Nothing. Telltrace has no accounts, no analytics, no advertising and no crash
 reporting of its own. We do not receive, store or sell any information
 about you, your computer or the phones you check.
 
@@ -35,7 +35,7 @@ you, not by the app.
 
 ## Children
 
-MVT GUI is not directed at children and collects no data from anyone.
+Telltrace is not directed at children and collects no data from anyone.
 
 ## Changes
 
@@ -45,4 +45,4 @@ with a new date.
 ## Contact
 
 Questions about privacy: open an issue at
-<https://github.com/Dream1Works/MVT-GUI/issues>.
+<https://github.com/Dream1Works/Telltrace/issues>.

@@ -1,12 +1,12 @@
-# MVT GUI
+# Telltrace
 # Copyright (c) 2026 2B-4G10. All rights reserved.
-# Proprietary: use of this file is governed by the MVT GUI End User
+# Proprietary: use of this file is governed by the Telltrace End User
 # License Agreement in the EULA.md file at the root of this repository.
 
 """Writes the winget manifests for a release.
 
     python3 packaging/update_packages.py --version 4.0.2-beta \\
-        --windows-zip dist/MVT-for-Windows-4.0.2-beta.zip
+        --windows-zip dist/Telltrace-for-Windows-4.0.2-beta.zip
 
 packages.yml runs it after a release is published and pushes the result to
 the default branch, so that packaging/winget holds manifests ready to submit
@@ -25,14 +25,16 @@ REPO = Path(__file__).resolve().parents[1]
 WINGET = REPO / "packaging" / "winget"
 
 OWNER = "2B-4G10"
-REPOSITORY = "https://github.com/Dream1Works/MVT-GUI"
-PACKAGE_ID = "2B-4G10.MVTForWindows"
+REPOSITORY = "https://github.com/Dream1Works/Telltrace"
+PACKAGE_ID = "2B-4G10.Telltrace"
 MANIFEST_VERSION = "1.10.0"
 SCHEMA = "https://aka.ms/winget-manifest.{kind}.1.10.0.schema.json"
 DESCRIPTION = (
-    "A desktop app for the Mobile Verification Toolkit (MVT), which looks for traces of "
-    "spyware on iPhones and Android phones. Back up a phone, download indicators, run "
-    "checks and read the results without the command line."
+    "Telltrace looks for traces of spyware on iPhones and Android phones. Back up a phone, "
+    "download indicators, run checks and read the results without the command line. "
+    "Powered by MVT, the Mobile Verification Toolkit created by Amnesty International's "
+    "Security Lab. Telltrace is an independent app, not affiliated with or endorsed by "
+    "Amnesty International."
 )
 
 
@@ -50,12 +52,12 @@ def release_url(version: str, name: str) -> str:
 
 def winget_manifests(version: str, digest: str, released: str) -> dict[str, str]:
     """The three files of a winget multi-file manifest."""
-    zip_name = f"MVT-for-Windows-{version}.zip"
+    zip_name = f"Telltrace-for-Windows-{version}.zip"
 
     def header(kind: str) -> str:
         return (
             f"# yaml-language-server: $schema={SCHEMA.format(kind=kind)}\n"
-            f"# Written by packaging/update_packages.py for MVT GUI {version}.\n\n"
+            f"# Written by packaging/update_packages.py for Telltrace {version}.\n\n"
             f"PackageIdentifier: {PACKAGE_ID}\n"
             f"PackageVersion: {version}\n"
         )
@@ -69,8 +71,8 @@ def winget_manifests(version: str, digest: str, released: str) -> dict[str, str]
         + "InstallerType: zip\n"
         + "NestedInstallerType: portable\n"
         + "NestedInstallerFiles:\n"
-        + "  - RelativeFilePath: MVT for Windows\\MVT for Windows.exe\n"
-        + "    PortableCommandAlias: mvt-gui\n"
+        + "  - RelativeFilePath: Telltrace\\Telltrace.exe\n"
+        + "    PortableCommandAlias: telltrace\n"
         # The app runs on the Python next to it, so it is started from its
         # folder rather than through a link.
         + "ArchiveBinariesDependOnPath: true\n"
@@ -87,13 +89,13 @@ def winget_manifests(version: str, digest: str, released: str) -> dict[str, str]
         + f"Publisher: {OWNER}\n"
         + f"PublisherUrl: https://github.com/{OWNER}\n"
         + f"PublisherSupportUrl: {REPOSITORY}/issues\n"
-        + "PackageName: MVT for Windows\n"
+        + "PackageName: Telltrace\n"
         + f"PackageUrl: {REPOSITORY}\n"
         + "License: Proprietary; MVT is under the MVT License 1.1\n"
         + f"LicenseUrl: {REPOSITORY}/blob/main/EULA.md\n"
-        + "ShortDescription: Desktop app for the Mobile Verification Toolkit (MVT)\n"
+        + "ShortDescription: Check phones for spyware, powered by MVT\n"
         + f"Description: {DESCRIPTION}\n"
-        + "Moniker: mvt-gui\n"
+        + "Moniker: telltrace\n"
         + "Tags:\n"
         + "".join(f"  - {tag}\n" for tag in ("android", "forensics", "ios", "mvt", "privacy", "security", "spyware"))
         + f"ReleaseNotesUrl: {REPOSITORY}/releases/tag/gui-v{version}\n"

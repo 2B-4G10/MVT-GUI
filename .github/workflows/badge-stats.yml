@@ -45,7 +45,7 @@ jobs:
 
           mac = sum(int(n) for name, n in assets if name.endswith("-macOS.zip"))
           win = sum(int(n) for name, n in assets
-                    if name.startswith("MVT-for-Windows-") and name.endswith(".zip"))
+                    if name.startswith(("Telltrace-for-Windows-", "MVT-for-Windows-")) and name.endswith(".zip"))
 
           windows_logo = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#fff" '
                           'd="M0 0h11.4v11.4H0zm12.6 0H24v11.4H12.6zM0 12.6h11.4V24H0zm12.6 0H24V24H12.6z"/></svg>')

@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
+# Written by packaging/update_packages.py for Telltrace 4.0.2-beta.
+
+PackageIdentifier: 2B-4G10.Telltrace
+PackageVersion: 4.0.2-beta
+PackageLocale: en-US
+Publisher: 2B-4G10
+PublisherUrl: https://github.com/2B-4G10
+PublisherSupportUrl: https://github.com/Dream1Works/Telltrace/issues
+PackageName: Telltrace
+PackageUrl: https://github.com/Dream1Works/Telltrace
+License: Proprietary; MVT is under the MVT License 1.1
+LicenseUrl: https://github.com/Dream1Works/Telltrace/blob/main/EULA.md
+ShortDescription: Check phones for spyware, powered by MVT
+Description: Telltrace looks for traces of spyware on iPhones and Android phones. Back up a phone, download indicators, run checks and read the results without the command line. Powered by MVT, the Mobile Verification Toolkit created by Amnesty International's Security Lab. Telltrace is an independent app, not affiliated with or endorsed by Amnesty International.
+Moniker: telltrace
+Tags:
+  - android
+  - forensics
+  - ios
+  - mvt
+  - privacy
+  - security
+  - spyware
+ReleaseNotesUrl: https://github.com/Dream1Works/Telltrace/releases/tag/gui-v4.0.2-beta
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

@@ -1,8 +1,8 @@
-MVT GUI
-https://github.com/Dream1Works/MVT-GUI
+Telltrace
+https://github.com/Dream1Works/Telltrace
 
-- MVT GUI, the Mac app and the Windows app: Copyright (c) 2026 2B-4G10.
-  All rights reserved. Proprietary, under the MVT GUI End User License
+- Telltrace, the Mac app and the Windows app: Copyright (c) 2026 2B-4G10.
+  All rights reserved. Proprietary, under the Telltrace End User License
   Agreement in EULA.md. Versions published before 25 November 2026 remain
   under the MVT License 1.1, and versions from then until the EULA took
   effect under the MVT GUI License 1.0.
@@ -24,6 +24,15 @@ license and where its license text is. Qt and PySide6 are under the GNU
 LGPL v3 (licenses\LGPL-3.0.txt and licenses\GPL-3.0.txt), and their source
 code is available from qt.io. The other source code is available from
 python.org and pypi.org.
+
+Name and credit
+---------------
+
+Telltrace was called MVT GUI before version 4.0.3. It is powered by MVT,
+the Mobile Verification Toolkit created by Amnesty International's Security
+Lab. Telltrace is an independent app: it is not affiliated with or endorsed
+by Amnesty International or the MVT project, and "MVT" names only the
+toolkit it includes.
 
 Third-party marks and artwork
 -----------------------------

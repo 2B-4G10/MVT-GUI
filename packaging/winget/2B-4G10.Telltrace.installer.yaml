@@ -1,19 +1,19 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json
-# Written by packaging/update_packages.py for MVT GUI 4.0.2-beta.
+# Written by packaging/update_packages.py for Telltrace 4.0.2-beta.
 
-PackageIdentifier: 2B-4G10.MVTForWindows
+PackageIdentifier: 2B-4G10.Telltrace
 PackageVersion: 4.0.2-beta
 InstallerType: zip
 NestedInstallerType: portable
 NestedInstallerFiles:
   - RelativeFilePath: MVT for Windows\MVT for Windows.exe
-    PortableCommandAlias: mvt-gui
+    PortableCommandAlias: telltrace
 ArchiveBinariesDependOnPath: true
 MinimumOSVersion: 10.0.17763.0
 ReleaseDate: 2026-11-27
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/Dream1Works/MVT-GUI/releases/download/gui-v4.0.2-beta/MVT-for-Windows-4.0.2-beta.zip
+    InstallerUrl: https://github.com/Dream1Works/Telltrace/releases/download/gui-v4.0.2-beta/MVT-for-Windows-4.0.2-beta.zip
     InstallerSha256: AECE8344C7BA9432971E73CA6DD98DDC78C67A002B76E8ACFF371C78029BD4C4
 ManifestType: installer
 ManifestVersion: 1.10.0

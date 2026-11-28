@@ -5,7 +5,7 @@
 Please don't report security problems in public issues.
 
 Report them privately through
-[GitHub's private vulnerability reporting](https://github.com/Dream1Works/MVT-GUI/security/advisories/new)
+[GitHub's private vulnerability reporting](https://github.com/Dream1Works/Telltrace/security/advisories/new)
 for this repository. Include what you found, how to reproduce it and the
 version of the app (Mac or Windows) you used.
 

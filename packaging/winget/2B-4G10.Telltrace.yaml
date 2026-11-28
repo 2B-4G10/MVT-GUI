@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json
-# Written by packaging/update_packages.py for MVT GUI 4.0.2-beta.
+# Written by packaging/update_packages.py for Telltrace 4.0.2-beta.
 
-PackageIdentifier: 2B-4G10.MVTForWindows
+PackageIdentifier: 2B-4G10.Telltrace
 PackageVersion: 4.0.2-beta
 DefaultLocale: en-US
 ManifestType: version

@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="images/icon.png" width="112" height="112" alt="MVT GUI icon">
+  <img src="images/icon.png" width="112" height="112" alt="Telltrace icon">
 </p>
 
-<h1 align="center">MVT GUI</h1>
+<h1 align="center">Telltrace</h1>
 
 <p align="center">
   <b>Check iPhones and Android phones for traces of known spyware.</b><br>
-  A friendly Mac and Windows app for Amnesty International's
-  <a href="https://docs.mvt.re/">Mobile Verification Toolkit</a>. No Terminal needed.
+  Powered by MVT, the <a href="https://docs.mvt.re/">Mobile Verification Toolkit</a>
+  created by Amnesty International's Security Lab. No Terminal needed.
 </p>
 
 <p align="center">
-  <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest"><img src="https://img.shields.io/github/v/release/Dream1Works/MVT-GUI?style=for-the-badge&label=download&logo=github&color=2ea44f" alt="Latest release"></a>
-  <a href="https://github.com/Dream1Works/MVT-GUI/releases"><img src="https://img.shields.io/github/downloads/Dream1Works/MVT-GUI/total?style=for-the-badge&label=downloads&color=0969da" alt="Total downloads"></a>
-  <a href="EULA.md"><img src="https://img.shields.io/badge/license-EULA-orange?style=for-the-badge" alt="License: MVT GUI EULA"></a>
+  <a href="https://github.com/Dream1Works/Telltrace/releases/latest"><img src="https://img.shields.io/github/v/release/Dream1Works/Telltrace?style=for-the-badge&label=download&logo=github&color=2ea44f" alt="Latest release"></a>
+  <a href="https://github.com/Dream1Works/Telltrace/releases"><img src="https://img.shields.io/github/downloads/Dream1Works/Telltrace/total?style=for-the-badge&label=downloads&color=0969da" alt="Total downloads"></a>
+  <a href="EULA.md"><img src="https://img.shields.io/badge/license-EULA-orange?style=for-the-badge" alt="License: Telltrace EULA"></a>
 </p>
 
 <p align="center">
-  <img src="images/setup.png" width="80%" alt="MVT GUI's Setup screen">
+  <img src="images/setup.png" width="80%" alt="Telltrace's Setup screen">
 </p>
 
 ## ⬇️ Download
@@ -38,10 +38,10 @@
       There is no Mac download here.
     </td>
     <td>
-      1. Download <code>MVT-for-Windows-….zip</code> from
-      <a href="https://github.com/Dream1Works/MVT-GUI/releases/latest">the latest release</a>.<br>
+      1. Download <code>Telltrace-for-Windows-….zip</code> from
+      <a href="https://github.com/Dream1Works/Telltrace/releases/latest">the latest release</a>.<br>
       2. Unzip it anywhere: Documents, the Desktop or a USB drive.<br>
-      3. Double-click <b>MVT for Windows.exe</b>. Nothing is installed.
+      3. Double-click <b>Telltrace.exe</b>. Nothing is installed.
     </td>
   </tr>
 </table>
@@ -148,14 +148,14 @@ times in **Settings → About phone**.
 
 ## ❤️ Support
 
-If MVT GUI helps you, you can support it on
+If Telltrace helps you, you can support it on
 [Patreon](https://patreon.com/Dossary) or [Ko-fi](https://ko-fi.com/2b4g10/10).
 Found a security problem? See [SECURITY.md](.github/SECURITY.md).
 
 ## 📄 License
 
-MVT GUI is Copyright © 2026 2B-4G10, licensed under the
-[MVT GUI End User License Agreement](EULA.md). Earlier versions keep the
+Telltrace is Copyright © 2026 2B-4G10, licensed under the
+[Telltrace End User License Agreement](EULA.md). Earlier versions keep the
 license they were released under.
 
 MVT, the engine inside, is Copyright © 2021-2026 The MVT Authors under the
@@ -163,5 +163,9 @@ MVT, the engine inside, is Copyright © 2021-2026 The MVT Authors under the
 [mvt-project/mvt](https://github.com/mvt-project/mvt). Credits for artwork
 and trademarks are in [NOTICE](NOTICE), and the Windows download lists every
 bundled component's license in `THIRD-PARTY-NOTICES.txt`.
+
+Telltrace (called MVT GUI before version 4.0.3) is an independent app. It
+is not affiliated with or endorsed by Amnesty International or the MVT
+project.
 
 <p align="center"><sub>Made by <a href="https://github.com/2B-4G10">2B-4G10</a></sub></p>

@@ -51,9 +51,9 @@ jobs:
         run: |
           version="${TAG#gui-v}"
           mkdir -p "$RUNNER_TEMP/assets"
-          gh release download "$TAG" --pattern 'MVT-for-Windows-*.zip' --dir "$RUNNER_TEMP/assets"
+          gh release download "$TAG" --pattern 'Telltrace-for-Windows-*.zip' --dir "$RUNNER_TEMP/assets"
           python3 packaging/update_packages.py --version "$version" \
-            --windows-zip "$RUNNER_TEMP/assets/MVT-for-Windows-${version}.zip" \
+            --windows-zip "$RUNNER_TEMP/assets/Telltrace-for-Windows-${version}.zip" \
             --date "$(gh release view "$TAG" --json publishedAt --jq '.publishedAt[0:10]')"
       - name: Push them
         run: |
@@ -94,7 +94,7 @@ jobs:
         # winget-pkgs checks submissions with Defender; this does the same
         # scan before anyone submits the manifests.
         run: |
-          $installer = Get-Content packaging/winget/2B-4G10.MVTForWindows.installer.yaml | Select-String "InstallerUrl: (.+)$"
+          $installer = Get-Content packaging/winget/2B-4G10.Telltrace.installer.yaml | Select-String "InstallerUrl: (.+)$"
           $zip = "$env:RUNNER_TEMP\app.zip"
           Invoke-WebRequest -Uri $installer.Matches[0].Groups[1].Value.Trim() -OutFile $zip
           $defender = "$env:ProgramFiles\Windows Defender\MpCmdRun.exe"
